@@ -37,7 +37,7 @@ typedef struct {
 	int dirty : 	1;
 	int unused:	7;
 	int frame:	20; 		// frame will be __NOFRAME if we free page frame
-} __attribute__((packed)) page_t;
+} page_t;
 
 
 

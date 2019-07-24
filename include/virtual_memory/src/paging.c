@@ -62,7 +62,6 @@ void paging_init()
     }
 
 	idt_handler(14, page_fault, 0x8E);
-    	asm volatile(	"sti");
 	asm volatile(	"pushl	%eax\n");
 	asm volatile(	"movl	%0, %%cr3\n" ::"r"(&kernel_directory->tablesPhysical));
 	asm volatile(	"movl 	%cr0, %eax\n");
@@ -90,46 +89,12 @@ page_t *get_page(uint32_t address, int make, page_directory_t *dir)
 	else
 		return NULL;
 }
-
-void monitor_write(uint32_t n)
-{
-	int32_t tmp;
-	char noZeroes = 1;
-
-	int i;
-	for(i = 28; i > 0; i -= 4)
-	{
-		tmp = (n>>i) & 0xF;
-		if(tmp == 0 && noZeroes != 0)
-		{
-			continue;
-		}
-
-		if(tmp >= 0xA)
-		{
-			noZeroes = 0;
-			tty_out_char(tmp - 0xA+'a');
-		}
-		else
-		{
-			noZeroes = 0;
-			tty_out_char(tmp+'0');
-		}
-	}
-
-	tmp = n & 0xF;
-	if( tmp >= 0xA )
-		tty_out_char(tmp-0xA+'a');
-	else
-		tty_out_char(tmp+'0');
-}
-
 void page_fault(uint32_t num, uint32_t err_code)
 {
 	// CR2 stores the linear address of the fault
 	uint32_t faulting_address;
 	asm volatile ("mov %%cr2, %0" : "=r"(faulting_address));
-	
+
 
 	/*
 	 * stack:	-> 	interrupt number
@@ -140,17 +105,8 @@ void page_fault(uint32_t num, uint32_t err_code)
 	uint32_t present = !((err_code & 0x1));	// Page not present
 	uint32_t rw = err_code & 0x2;		// Write operation ?
 	uint32_t us = err_code & 0x4;		// Processor was in user-mode?
-	uint32_t reserved = err_code & 0x8;		// Overwritten CPU reserved bits
-	uint32_t id = err_code & 0x10;		// Caused by an instruction
-
-	// Error message
-	tty_write_string("Page fault! (");
-	if (present) tty_write_string("present ");
-	if (rw) tty_write_string("read-only ");
-	if (us) tty_write_string("user-mode ");
-	if (reserved) tty_write_string("reserved ");
-	tty_write_string(") at 0x"); 
-	monitor_write(faulting_address);
+	uint32_t reserved = err_code & 0x8;	// Overwritten CPU reserved bits
+	tty_write_string("page fault");
 	while(1);
 }
 

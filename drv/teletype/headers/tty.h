@@ -32,5 +32,5 @@ void tty_move_cursor(uint32_t);	// move the cursor
 void tty_clear_screen();		
 
 void tty_write_string(const char*);
-
+void tty_write_address(const uint32_t);
 #endif

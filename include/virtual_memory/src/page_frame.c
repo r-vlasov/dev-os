@@ -45,7 +45,7 @@ void alloc_frame(page_t *page, uint8_t kernel, uint8_t writeable)
 		 }
 		 set_frame_bitmap(clrindex);
 		 page->present = 1;
-		 page->rw = writeable;
+		 page->rw = !writeable;
 		 page->user = kernel;
 		 page->frame = clrindex;
 	 }

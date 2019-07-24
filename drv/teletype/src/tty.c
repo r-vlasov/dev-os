@@ -70,3 +70,19 @@ void tty_write_string(const char* str)
 		tty_out_char(*str);
 	}
 }
+
+void tty_write_address(const uint32_t address)
+{
+	int tmp;
+	for (int i = 32; i > 0; i -= 4)
+	{
+		tmp = ( address >> i ) & 0xF;
+		if (tmp >= 0xA)
+			tty_out_char('A' + tmp - 0xA);
+		else
+			tty_out_char('0' + tmp);
+	}
+}
+
+
+

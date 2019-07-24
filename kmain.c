@@ -19,8 +19,8 @@ void kmain(int magic, struct multiboot *multiboot_specification)
 	idt_init();
 	drivers_init();
 	paging_init();
-	uint32_t * ptr = (uint32_t*) 0xa000000;
-	uint32_t do2 = *ptr;
+	uint32_t a = 0xAAAAAAAA;
+	tty_write_address(a);
 	while(1);
 }
 
