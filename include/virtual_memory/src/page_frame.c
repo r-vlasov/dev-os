@@ -1,11 +1,5 @@
-#include "page_frame.h"
-
-/* We need a structure where we will contain frame of pages */
-/* It is bitmap */
-
-
-uint32_t* page_frames;
-uint32_t nframes;
+#include "../headers/page_frame.h"
+#include "../../../drv/teletype/headers/tty.h"
 
 
 void	set_frame_bitmap(uint32_t i)
@@ -16,40 +10,44 @@ void 	unset_frame_bitmap(uint32_t i)
 {
 	page_frames[INDEX(i)] &= ~(1 << OFFSET(i));
 }
-int 	get_frame_bitmap(uint32_t i);
+int 	get_frame_bitmap(uint32_t i)
 {
-	return page_frames[INTEX(i)] & (1 OFFSET(i));
+	return page_frames[INDEX(i)] & (1 << OFFSET(i));
 }
-void 	search_clear_bit() 
+int 	search_clear_bit() 
 {
 	uint32_t mask;
-	for (static int i = 0; i < INDEX(nframes); i++)
+	for (uint32_t i = 0; i < INDEX(nframes); i++)
 	{
-		for (static int j = 0; j < 32; j++)
+		for (int j = 0; j < 32; j++)
 		{
 			mask = 0x1 << j;
 			if (!(page_frames[i] & mask))
 				return i*32+j;
 		}
 	}
+	return -1;
 }
 
 
-/* from tutorial gownos.blogspot.com */
 
-void alloc_frame(page_t *page, int kernel, int writeable)
+void alloc_frame(page_t *page, uint8_t kernel, uint8_t writeable)
 {
 	 if(page->frame != 0)
 		 return;
 	 else
 	 {
-		 uint32_t idx = search_clear_bit();
-		 if (idx == (uint32_t)-1);
-		 set_frame_bitmap(idx);
+		 int32_t clrindex = search_clear_bit();
+		 if (clrindex == -1 )
+		 {
+			tty_write_string("Haven't free frame");
+			return;
+		 }
+		 set_frame_bitmap(clrindex);
 		 page->present = 1;
 		 page->rw = writeable;
 		 page->user = kernel;
-		 page->frame = idx;
+		 page->frame = clrindex;
 	 }
 }
 
@@ -62,7 +60,7 @@ void free_frame(page_t *page)
 	else
 	{
 		unset_frame_bitmap(frame);
-		page->frame = 0;
+		page->frame = __NOFRAME;
 	}
 }
 

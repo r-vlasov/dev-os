@@ -3,5 +3,8 @@
 
 #include "string.h"
 
+
+void itoa(int n, char s[]);
+
 #endif
 

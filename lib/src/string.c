@@ -78,6 +78,28 @@ char* 	strcpy	(char* dest, const char* src)
 	return result;
 }
 
+/*	String Length	*/
+size_t 	strlen	(const char* s)
+{
+	size_t size = 0;
+	int i = 0;
+	while (s[i] != '\0')
+	{
+		size++;
+	}
+	return size + 1;
+}
 
-
-
+/*	Reverse the string	*/
+void	reverse	(char* s)
+{
+	char ch;
+	int i1 = 0;
+	int i2 = strlen(s) - 1;
+	for (i1 = 0, i2 = strlen(s) - 1; i1 < i2; i1++, i2--)
+	{
+		ch = s[i1];
+		s[i1] = s[i2];
+		s[i2] = ch;
+	}
+}

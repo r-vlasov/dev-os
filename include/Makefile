@@ -12,10 +12,12 @@ ASFLAGS = -f elf32
 	$(AS) $(ASFLAGS) $< -o $@
 
 DIR1 = desc_tables 
-
-	
+DIR2 = virtual_memory
+DIR3 = heap
 run:	
 	$(MAKE) -C $(DIR1)
+	$(MAKE) -C $(DIR2)
+	$(MAKE) -C $(DIR3)
 	mv *.o ..
 
 

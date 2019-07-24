@@ -15,5 +15,5 @@ void* 	memset	(void*, int, size_t);
 
 char* 	strcpy	(char*, const char*);
 size_t 	strlen	(const char*);
-
+void 	reverse (char*);
 #endif

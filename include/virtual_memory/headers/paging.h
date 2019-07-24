@@ -1,5 +1,9 @@
+#ifndef PAGING
+#define PAGING
+
 /* Paging from jamesmolloy.co.uk :)))) */
 
+#define __PAGES_IN_PAGETABLE_LINE	1024
 
 #include "../../../lib/headers/stdlib.h"
 
@@ -31,15 +35,14 @@ typedef struct {
 	int user: 	1;
 	int accessed: 	1;
 	int dirty : 	1;
-	int reserved:	4;
-	int avail:	3;
-	int frame:	20;
+	int unused:	7;
+	int frame:	20; 		// frame will be __NOFRAME if we free page frame
 } __attribute__((packed)) page_t;
 
 
 
 typedef struct {
-	page_t pages[1024];
+	page_t pages[__PAGES_IN_PAGETABLE_LINE];
 } page_table_t;
 
 
@@ -59,11 +62,9 @@ typedef struct {
 
 	void paging_init();			// set up environment
 
-	void switch_page_directory(page_directory_t *new);
-
 	page_t* get_page(uint32_t address, int make, page_directory_t *dir); // Retrieves a pointer to the page required. If make == 1 and the page-table isn't created than it will create.
 
 	void page_fault(uint32_t stack_frame, uint32_t page_error_code); // See "desc_tables/src/isrs.s" page fault
 
 
-
+#endif
