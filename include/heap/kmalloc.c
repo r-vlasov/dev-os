@@ -1,11 +1,5 @@
-#ifndef KHEAP_C
-#define KHEAP_C
+#include "kmalloc.h"
 
-#include "headers/dheap.h"
-#include "headers/pheap.h"
-
-
-extern heap_t* heap;
 
 uint32_t kmalloc_int(uint32_t sz, int align, uint32_t *phys)
 {
@@ -47,5 +41,3 @@ void kfree(uint32_t ptr)
 		dfree(ptr);
 	}
 }
-
-#endif

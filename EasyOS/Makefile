@@ -10,5 +10,6 @@ run:
 	$(MAKE) -C $(DIR2)
 	bochs
 
-edit:
-	vim EasyOS/include/desc_tables/src/interrupt_desc_table.c
+start: 
+	$(MAKE) build
+	$(MAKE) run

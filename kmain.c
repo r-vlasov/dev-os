@@ -4,8 +4,10 @@
 extern void gdt_init();
 extern void idt_init();
 extern void heap_init();
-extern void* kmalloc(size_t);
-extern void kfree(void*);
+
+
+#include "include/heap/kmalloc.h"
+extern uint32_t kmalloc(uint32_t);
 #define MBOOT_MAGIC	0x2BADB002
 /*	
  *	The fact is that according to MULTIBOOT SPEC. GRUB places in %eax a special identifier
@@ -22,8 +24,6 @@ void kmain(int magic, struct multiboot *multiboot_specification)
 	idt_init();
 	drivers_init();
 	paging_init();
-	
-	tty_write_string("sad");
 	int* a = kmalloc(8);
 	int* b = kmalloc(1);
 	int* c = kmalloc(1);

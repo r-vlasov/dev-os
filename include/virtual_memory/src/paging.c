@@ -1,6 +1,6 @@
 #include "../headers/paging.h"
 #include "../headers/page_frame.h"
-#include "../../heap/kheap.c"
+#include "../../heap/kmalloc.h"
 #include "../../../lib/headers/stdlib.h"
 
 /*	VMM has 3 parts:
@@ -23,8 +23,6 @@
 */
 
 page_directory_t* kernel_directory = NULL;
-//page_directory_t *current_directory = NULL;
-
 extern uint32_t placement_address;   			// Space after kernel_end(initial in linker script 
 extern void idt_handler(uint8_t, void*, uint8_t);	// INT14 handler
 extern void load_page_directory();			// load CR0, CR3 ( turn on paging:) )
@@ -86,7 +84,7 @@ void paging_init()
 	asm volatile(	"movl 	%eax, %cr0\n");
 	asm volatile( 	"popl	%eax");	
 
-	// Heap init
+	// Heap initialization
 	heap_init();
 
 
