@@ -7,12 +7,12 @@
 
 #define INDEX(a)  	(a/32)
 #define OFFSET(a) 	(a%32)
-#define PAGE_SIZE 	0x1000;
+#define PAGE_SIZE 	0x1000
 
 
 /////////////////////////////////
-#define __ERROR_FRAME_CODE	-111;
-#define __NOFRAME		0;
+#define __ERROR_FRAME_CODE	-111
+#define __NOFRAME		0
 
 /* We need a structure where we will contain frame of pages */
 /* It will be bitmap */

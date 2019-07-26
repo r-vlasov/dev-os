@@ -60,7 +60,7 @@ void paging_init()
         	alloc_frame( get_page(i, 1, kernel_directory),0,0);
         	i += PAGE_SIZE;
     	}
-    	for(uint32_t s = 0xC0000000; s < 0xC0000000 + 0x10000; s+= 0x1000)
+    	for(uint32_t s = KHEAP_START; s < KHEAP_START + KHEAP_START_SIZE; s += PAGE_SIZE)
 	{
 	    	alloc_frame(get_page(s, 1, kernel_directory), 0, 0);
 	}
