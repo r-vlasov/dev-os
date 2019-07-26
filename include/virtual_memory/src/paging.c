@@ -34,14 +34,14 @@ extern void load_page_directory();			// load CR0, CR3 ( turn on paging:) )
 
 void paging_init()
 {
-    uint32_t mem_end_page = 0x1000000;  // The size of our memory(16MB)
+	uint32_t mem_end_page = 0x10000000;  // The size of our memory(16MB)
 
-    nframes = mem_end_page / PAGE_SIZE;	// Number of page frames
-    page_frames = (uint32_t*)kmalloc(INDEX(nframes));
-    memset(page_frames, 0, INDEX(nframes));
+    	nframes = mem_end_page / PAGE_SIZE;	// Number of page frames
+    	page_frames = (uint32_t*)kmalloc(INDEX(nframes));
+    	memset(page_frames, 0, INDEX(nframes));
 
-    kernel_directory = (page_directory_t*)kmalloc_a(sizeof(page_directory_t));
-    memset(kernel_directory, 0, sizeof(page_directory_t));
+    	kernel_directory = (page_directory_t*)kmalloc_a(sizeof(page_directory_t));
+    	memset(kernel_directory, 0, sizeof(page_directory_t));
 
     /**
      * Теперь нам необходимо тождественно отобразить
@@ -52,14 +52,18 @@ void paging_init()
      * цикл while, т.к. внутри тела цикла значение переменной
      * placement_address изменяется при вызове kmalloc().
      */
-    int i = 0;
-    while (i < placement_address)
-    {
+    	int i = 0;
+    	while (i < placement_address)
+    	{
         // Код ядра доступен для чтения но не для записи
         // из пространства пользователя
-        alloc_frame( get_page(i, 1, kernel_directory),0,0);
-        i += PAGE_SIZE;
-    }
+        	alloc_frame( get_page(i, 1, kernel_directory),0,0);
+        	i += PAGE_SIZE;
+    	}
+    	for(uint32_t s = 0xC0000000; s < 0xC0000000 + 0x10000; s+= 0x1000)
+	{
+	    	alloc_frame(get_page(s, 1, kernel_directory), 0, 0);
+	}
 
 	idt_handler(14, page_fault, 0x8E);
 	asm volatile(	"pushl	%eax\n");
@@ -107,6 +111,13 @@ void page_fault(uint32_t num, uint32_t err_code)
 	uint32_t us = err_code & 0x4;		// Processor was in user-mode?
 	uint32_t reserved = err_code & 0x8;	// Overwritten CPU reserved bits
 	tty_write_string("page fault");
+
+	if (present) tty_write_string("present");
+	if (rw) tty_write_string("rw");	
+	if (us) tty_write_string("us");
+	if (reserved) tty_write_string("reserved");
+	
+	tty_write_address(faulting_address);
 	while(1);
 }
 

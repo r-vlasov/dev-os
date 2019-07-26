@@ -74,15 +74,25 @@ void tty_write_string(const char* str)
 void tty_write_address(const uint32_t address)
 {
 	int tmp;
-	for (int i = 32; i > 0; i -= 4)
+	int mask = 1;
+	for (int i = 28; i > 0; i -= 4)
 	{
 		tmp = ( address >> i ) & 0xF;
+		if(tmp == 0 && mask == 1)
+		{
+			continue;
+		}
 		if (tmp >= 0xA)
 			tty_out_char('A' + tmp - 0xA);
 		else
 			tty_out_char('0' + tmp);
+		mask = 0;
 	}
+	tmp = address & 0xF;
+	if (tmp >= 0xA)
+		tty_out_char(tmp-0xA+'A');
+	else
+		tty_out_char(tmp+'0');
 }
-
 
 
