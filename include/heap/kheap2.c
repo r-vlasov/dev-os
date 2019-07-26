@@ -40,12 +40,4 @@ uint32_t kmalloc(uint32_t sz)
 	return kmalloc_int(sz, 0, 0);
 }
 
-void kfree(uint32_t ptr)
-{
-	if (heap)
-	{
-		dfree(ptr);
-	}
-}
-
 #endif

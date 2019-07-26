@@ -3,8 +3,9 @@
 #include "include/virtual_memory/headers/paging.h"
 extern void gdt_init();
 extern void idt_init();
-extern void create_heap(uint32_t, uint32_t, uint32_t, uint8_t);
-extern void* malloc1(size_t);
+extern void heap_init();
+extern void* kmalloc(size_t);
+extern void kfree(void*);
 #define MBOOT_MAGIC	0x2BADB002
 /*	
  *	The fact is that according to MULTIBOOT SPEC. GRUB places in %eax a special identifier
@@ -23,17 +24,20 @@ void kmain(int magic, struct multiboot *multiboot_specification)
 	paging_init();
 	
 	tty_write_string("sad");
-	create_heap(0xC0000000, 0x10000, 0x50000, 0);
-
-	char* a = (char*)malloc1(8);
-	uint32_t b = malloc1(8);
-	uint32_t c = malloc1(8);
+	heap_init();
+	int* a = kmalloc(8);
+	int* b = kmalloc(1);
+	int* c = kmalloc(1);
+	kfree(b);
+	int* d = kmalloc(1);
 
 	tty_write_address(a);
 	tty_out_char('\n');
 	tty_write_address(b);
 	tty_out_char('\n');
 	tty_write_address(c);
+	tty_out_char('\n');
+	tty_write_address(d);
 	while(1);
 }
 

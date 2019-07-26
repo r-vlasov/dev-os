@@ -1,12 +1,9 @@
-OBJECTS = kheap2.o
+OBJECTS = dheap.o pheap.o 
 CC = gcc
 CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
              -nostartfiles -nodefaultlibs -Wall -Wextra  -c
 AS = nasm
 ASFLAGS = -f elf32
-
-
-DIR1 = src
 
 
 %.o: %.c
@@ -16,9 +13,7 @@ DIR1 = src
 	$(AS) $(ASFLAGS) $< -o $@
 
 
-run:
-	$(kheap.o)
-	$(MAKE) -C $(DIR1)
+run: 	$(OBJECTS)
 	mv *.o ..
 
 
