@@ -43,7 +43,11 @@ void paging_init()
     	kernel_directory = (page_directory_t*)kmalloc_a(sizeof(page_directory_t));
     	memset(kernel_directory, 0, sizeof(page_directory_t));
 
-    /**
+    
+	// there is because get_page changes placement_address
+
+	
+	/**
      	** Теперь нам необходимо тождественно отобразить
     	** адреса виртуальной памяти на адреса физической памяти,
     	** чтобы мы могли прозрачно обращаться к физической памяти,
@@ -60,12 +64,18 @@ void paging_init()
         	alloc_frame( get_page(i, 1, kernel_directory),0,0);
         	i += PAGE_SIZE;
     	}
-    	for(uint32_t s = KHEAP_START; s < KHEAP_START + KHEAP_START_SIZE; s += PAGE_SIZE)
-	{
-	    	alloc_frame(get_page(s, 1, kernel_directory), 0, 0);
-	}
-
+	// Initializing page fault handler
 	idt_handler(14, page_fault, 0x8E);
+	
+
+	for(uint32_t s = KHEAP_START; s < KHEAP_START + KHEAP_START_SIZE; s += PAGE_SIZE)
+	{
+	    	alloc_frame( get_page(s, 1, kernel_directory), 0, 0);
+	}
+		// Heap init
+//	heap_init();
+
+
 	asm volatile(	"pushl	%eax\n");
 	asm volatile(	"movl	%0, %%cr3\n" ::"r"(&kernel_directory->tablesPhysical));
 	asm volatile(	"movl 	%cr0, %eax\n");
