@@ -24,7 +24,6 @@ void kmain(int magic, struct multiboot *multiboot_specification)
 	paging_init();
 	
 	tty_write_string("sad");
-	heap_init();
 	int* a = kmalloc(8);
 	int* b = kmalloc(1);
 	int* c = kmalloc(1);

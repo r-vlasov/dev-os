@@ -43,9 +43,13 @@ void paging_init()
     	kernel_directory = (page_directory_t*)kmalloc_a(sizeof(page_directory_t));
     	memset(kernel_directory, 0, sizeof(page_directory_t));
 
-    
+    	int i;
 	// there is because get_page changes placement_address
-
+	
+	for (i = KHEAP_START; i < KHEAP_START + KHEAP_START_SIZE; i += PAGE_SIZE)
+	{
+		get_page(i, 1, kernel_directory);
+	}
 	
 	/**
      	** Теперь нам необходимо тождественно отобразить
@@ -56,7 +60,7 @@ void paging_init()
      	** цикл while, т.к. внутри тела цикла значение переменной
      	** placement_address изменяется при вызове kmalloc().
      **/
-    	int i = 0;
+    	i = 0;
     	while (i < placement_address)
     	{
         // Код ядра доступен для чтения но не для записи
@@ -64,6 +68,8 @@ void paging_init()
         	alloc_frame( get_page(i, 1, kernel_directory),0,0);
         	i += PAGE_SIZE;
     	}
+
+
 	// Initializing page fault handler
 	idt_handler(14, page_fault, 0x8E);
 	
@@ -72,9 +78,6 @@ void paging_init()
 	{
 	    	alloc_frame( get_page(s, 1, kernel_directory), 0, 0);
 	}
-		// Heap init
-//	heap_init();
-
 
 	asm volatile(	"pushl	%eax\n");
 	asm volatile(	"movl	%0, %%cr3\n" ::"r"(&kernel_directory->tablesPhysical));
@@ -82,6 +85,11 @@ void paging_init()
 	asm volatile(	"orl	$(1 << 31), %eax\n");
 	asm volatile(	"movl 	%eax, %cr0\n");
 	asm volatile( 	"popl	%eax");	
+
+	// Heap init
+	heap_init();
+
+
 }
 
 page_t *get_page(uint32_t address, int make, page_directory_t *dir)
