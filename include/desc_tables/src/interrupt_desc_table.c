@@ -94,9 +94,9 @@ void idt_init()
 // Our assemler ISR_handler firstly pushs error code
 // 			    secondly pushs number of interrupts
 // We use calling convention __cdecl, so the first parameter is number and the second is error
-void isr(uint32_t numb, uint32_t error_code)
+void isr(registers_t regs)
 {
-	tty_out_char('0' + numb);
+	tty_out_char('0' + regs.number);
 }
 
 

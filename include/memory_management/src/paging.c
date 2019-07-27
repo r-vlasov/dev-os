@@ -22,7 +22,7 @@
  *	the lower 12 bits of the linear address
 */
 
-page_directory_t* kernel_directory = NULL;
+extern page_directory_t* kernel_directory;
 extern uint32_t placement_address;   			// Space after kernel_end(initial in linker script 
 extern void idt_handler(uint8_t, void*, uint8_t);	// INT14 handler
 extern void load_page_directory();			// load CR0, CR3 ( turn on paging:) )
@@ -109,7 +109,7 @@ page_t *get_page(uint32_t address, int make, page_directory_t *dir)
 	else
 		return NULL;
 }
-void page_fault(uint32_t num, uint32_t err_code)
+void page_fault(registers_t regs)
 {
 	// CR2 stores the linear address of the fault
 	uint32_t faulting_address;
@@ -121,7 +121,7 @@ void page_fault(uint32_t num, uint32_t err_code)
 	 *  		->	interrupt error code		(see: IDT)
 	 *  		-> 	............
 	*/
-
+	uint32_t err_code = regs.err_code;
 	uint32_t present = !((err_code & 0x1));	// Page not present
 	uint32_t rw = err_code & 0x2;		// Write operation ?
 	uint32_t us = err_code & 0x4;		// Processor was in user-mode?

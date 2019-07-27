@@ -1,11 +1,20 @@
 #include "kmalloc.h"
 
 
+
 uint32_t kmalloc_int(uint32_t sz, int align, uint32_t *phys)
 {
 	if (heap)
 	{
-		return dmalloc (sz);
+		void *addr;
+		addr = alloc(sz, heap);
+
+		if (phys != 0)
+		{
+			page_t *page = get_page((uint32_t)addr, 0, kernel_directory);
+			*phys = page->frame*PAGE_SIZE + (((uint32_t)addr)& (-PAGE_SIZE));
+		}
+		return (uint32_t)addr;
 	}
 	else
 	{

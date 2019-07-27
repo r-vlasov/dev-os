@@ -1,6 +1,6 @@
 #include "drv/drivers.h"
 
-#include "include/virtual_memory/headers/paging.h"
+#include "include/memory_management/headers/paging.h"
 extern void gdt_init();
 extern void idt_init();
 extern void heap_init();
@@ -24,19 +24,10 @@ void kmain(int magic, struct multiboot *multiboot_specification)
 	idt_init();
 	drivers_init();
 	paging_init();
-	int* a = kmalloc(8);
-	int* b = kmalloc(1);
-	int* c = kmalloc(1);
-	kfree(b);
-	int* d = kmalloc(1);
+	int* a = kmalloc(0x90000);
 
 	tty_write_address(a);
 	tty_out_char('\n');
-	tty_write_address(b);
-	tty_out_char('\n');
-	tty_write_address(c);
-	tty_out_char('\n');
-	tty_write_address(d);
 	while(1);
 }
 

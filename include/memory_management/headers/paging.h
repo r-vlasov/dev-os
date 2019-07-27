@@ -6,6 +6,7 @@
 #define __PAGES_IN_PAGETABLE_LINE	1024
 
 #include "../../../lib/headers/stdlib.h"
+#include "../../registers.h"
 
 /*			Struct of page entries
  *
@@ -57,6 +58,11 @@ typedef struct {
 	uint32_t physicalAddress; 	// physical address of tablesPhysical
 } page_directory_t;
 
+//
+ 
+page_directory_t* kernel_directory;
+
+//
 
 /* Functions */
 
@@ -64,7 +70,7 @@ typedef struct {
 
 	page_t* get_page(uint32_t address, int make, page_directory_t *dir); // Retrieves a pointer to the page required. If make == 1 and the page-table isn't created than it will create.
 
-	void page_fault(uint32_t stack_frame, uint32_t page_error_code); // See "desc_tables/src/isrs.s" page fault
+	void page_fault(registers_t regs); // See "desc_tables/src/isrs.s" page fault
 
 
 #endif

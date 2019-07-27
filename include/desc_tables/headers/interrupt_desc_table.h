@@ -3,6 +3,7 @@
 
 
 #include "../../../lib/headers/stdlib.h"
+#include "../../registers.h"
 
 typedef struct {
 	uint16_t lowerbits;
@@ -26,7 +27,7 @@ typedef struct {
 
 uint8_t irq_base;
 
-void idt_handler(uint8_t , void* , uint8_t); 	// int handler
+void idt_handler(uint8_t index, void* handler, uint8_t type); 	// int handler
 
 void idt_init();				// int description table initial
 

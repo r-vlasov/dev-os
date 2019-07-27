@@ -1,7 +1,12 @@
 #include "../headers/dheap.h"
+#include "../../memory_management/headers/paging.h"
+#include "../../memory_management/headers/page_frame.h"
 
+extern	page_directory_t* kernel_directory;
+extern 	heap_t *heap;
+extern 	page_t* get_page(uint32_t address, int make, page_directory_t *dir);
+extern 	void alloc_frame(page_t*, uint8_t, uint8_t);
 
-extern heap_t *heap;
 
 void heap_init()
 {
@@ -25,6 +30,7 @@ void create_heap(uint32_t start, uint32_t size, uint32_t max, uint8_t readonly)
 static heap_chunk_t* find_chunk(uint32_t size, heap_t* heap)
 {
 	heap_chunk_t* result = NULL;
+
 	for (heap_chunk_t* chunk = heap->head; chunk != NULL && result == NULL; chunk = chunk->next)
 	{
 		if(chunk->size >= size && !chunk->allocated)
@@ -50,12 +56,37 @@ static void insert_chunk(heap_chunk_t* chunk, uint32_t size, heap_t* heap)
 	chunk->next = temp;
 	chunk->allocated = 1;
 }
+/*
+
+#include "../../../drv/teletype/headers/tty.h"
+
+static uint8_t extend(uint32_t new_size, heap_t *heap)
+{
+	if (new_size > heap->max_addr - heap->start_addr)
+		return 0;
+	new_size = new_size & (-PAGE_SIZE);
+	new_size += PAGE_SIZE;
+	
+	uint32_t old_size = heap->end_addr - heap->start_addr;
+	for (int i = old_size; i < new_size; i+= PAGE_SIZE)
+	{
+		alloc_frame( get_page(heap->start_addr + i, 1, kernel_directory), 0, 0);
+	}
+	heap->end_addr = heap->start_addr + new_size;
+	return 1;
+}
+*/
+
+
+uint32_t alloc(uint32_t sz, heap_t* heap)
+{
+	return dmalloc(sz);
+}
 
 void* dmalloc(uint32_t size)
-{
-	heap_chunk_t* result = find_chunk(size, heap);
+{	
+	heap_chunk_t* result =  find_chunk(size, heap);
 	insert_chunk(result, size, heap);
-	
 	return ALLOC_DATA_PTR(result);
 }
 

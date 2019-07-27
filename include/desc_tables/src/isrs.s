@@ -210,7 +210,28 @@ __isr18:
 
 
 __common_handler:
-	call isr
+	pusha 		; pushing edi, esi, ebp, .... , eax
+	
+	mov ax, ds
+	push eax	; we can't "push ds"
+	
+
+	; Loading data segment offset designed for the kernel
+	mov ax, 0x10
+	mov ds, ax
+	mov es, ax
+	mov fs, ax
+	mov gs, ax
+
+	call isr	; common handler describes in C-prog
+
+	pop eax
+	mov ds, ax
+	mov es, ax
+	mov fs, ax
+	mov gs, ax
+
+	popa
 	add esp, 8  ; Clear the stack of error code and interrupt number
 	sti
 	iret

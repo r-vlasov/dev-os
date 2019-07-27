@@ -1,4 +1,3 @@
-OBJECTS = kmalloc.o
 CC = gcc
 CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
              -nostartfiles -nodefaultlibs -Wall -Wextra  -c
@@ -15,14 +14,12 @@ DIR1 = src
 %.o: %.s
 	$(AS) $(ASFLAGS) $< -o $@
 
-
-run:	src
+run:
+	gcc -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
+             -nostartfiles -nodefaultlibs -Wall -Wextra  -c kmalloc.c -o kmalloc.o
+	$(MAKE) -C $(DIR1)
 	mv *.o ..
 
-
-
-src: $(OBJECTS)
-	$(MAKE) -C $(DIR1)
 
 
 

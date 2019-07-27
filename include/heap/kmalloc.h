@@ -4,8 +4,13 @@
 #include "headers/dheap.h"
 #include "headers/pheap.h"
 
+#include "../memory_management/headers/page_frame.h"
+#include "../memory_management/headers/paging.h"
+
+
 
 uint32_t kmalloc_int(uint32_t sz, int align, uint32_t *phys);
+
 uint32_t kmalloc_a(uint32_t sz);
 uint32_t kmalloc_p(uint32_t sz, uint32_t *phys);
 uint32_t kmalloc_ap(uint32_t sz, uint32_t *phys);
