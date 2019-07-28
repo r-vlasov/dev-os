@@ -13,7 +13,7 @@ void heap_init()
 	create_heap(KHEAP_START, KHEAP_START_SIZE, KHEAP_MAX, 0);
 }
 
-void create_heap(uint32_t start, uint32_t size, uint32_t max, uint8_t readonly)
+static void create_heap(uint32_t start, uint32_t size, uint32_t max, uint8_t readonly)
 {
 	heap = (heap_t*) start;
 	start += SIZEOF(heap_t);
@@ -39,10 +39,7 @@ static heap_chunk_t* find_chunk(uint32_t size, heap_t* heap)
 	return result;
 }
 
-
-#include "../../../drv/teletype/headers/tty.h"
-
-heap_chunk_t* find_chunk_align(uint32_t size, heap_t* heap)
+static heap_chunk_t* find_chunk_align(uint32_t size, heap_t* heap)
 {
 	heap_chunk_t* result = NULL;
 	uint32_t new_size;
@@ -88,7 +85,7 @@ static void insert_chunk(heap_chunk_t* chunk, uint32_t size, heap_t* heap)
 
 
 
-heap_chunk_t* insert_chunk_align(heap_chunk_t* chunk, uint32_t size, heap_t* heap)
+static heap_chunk_t* insert_chunk_align(heap_chunk_t* chunk, uint32_t size, heap_t* heap)
 {
 	uint32_t offset;
 	offset = 0x1000 - ( (uint32_t)chunk + 2 * SIZEOF(heap_chunk_t) ) % 0x1000;
@@ -99,15 +96,30 @@ heap_chunk_t* insert_chunk_align(heap_chunk_t* chunk, uint32_t size, heap_t* hea
 }
 
 
-uint8_t extend(uint32_t new_size, heap_t *heap)
+static uint8_t extend(uint32_t new_size, heap_t *heap)
 {
 	if (new_size > heap->max_addr - heap->start_addr)
 		return 0;
-	new_size = new_size & (-PAGE_SIZE);
+
+	new_size = new_size & 0xFFFFF000;
 	new_size += PAGE_SIZE;
 	
+
 	uint32_t old_size = heap->end_addr - heap->start_addr;
-	for (int i = old_size; i <= new_size; i+= PAGE_SIZE)
+//* KHEAP_START->obj1->obj2->obj3 so we should increse obj3 size, if it's not allocated *//
+	heap_chunk_t* chunk;
+	for (chunk = heap->head; chunk->next != NULL; chunk = chunk->next);
+	if ( chunk->allocated )
+	{
+		insert_chunk(chunk, new_size - old_size - SIZEOF(heap_chunk_t), heap);
+		chunk->allocated = 0;
+	}
+	else
+	{
+		chunk->size += new_size - old_size;
+	}
+//* *//	
+	for (uint32_t i = old_size; i < new_size; i+= PAGE_SIZE)
 	{
 		alloc_frame( get_page(heap->start_addr + i, 1, kernel_directory), 0, 0);
 	}
@@ -129,8 +141,6 @@ void* dmalloc(uint32_t size)
 void* dmalloc_align(uint32_t size)
 {
 	heap_chunk_t* result1 = find_chunk_align(size, heap);
-//	tty_write_address(result1);
-//	tty_out_char('\n');
 	heap_chunk_t* result2 = insert_chunk_align(result1, size, heap);
 	return ALLOC_DATA_PTR(result2);
 }

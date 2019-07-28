@@ -11,7 +11,7 @@
 
 #include "../../../lib/headers/stdlib.h"
 
-#define KHEAP_START		0xc0000000
+#define KHEAP_START		0xc000000
 #define KHEAP_START_SIZE	0x100000
 #define KHEAP_MAX		0x500000
 #define KHEAP_PIECE		0x100000
@@ -48,11 +48,11 @@ void heap_init();
 
 static void create_heap(uint32_t start, uint32_t size, uint32_t max, uint8_t readonly);
 static heap_chunk_t* find_chunk(uint32_t size, heap_t* heap);
-heap_chunk_t* find_chunk_align(uint32_t size, heap_t* heap);
-heap_chunk_t* insert_chunk_align(heap_chunk_t* chunk, uint32_t size, heap_t* heap);
+static heap_chunk_t* find_chunk_align(uint32_t size, heap_t* heap);
+static heap_chunk_t* insert_chunk_align(heap_chunk_t* chunk, uint32_t size, heap_t* heap);
 static void insert_chunk(heap_chunk_t* chunk, uint32_t size, heap_t* heap);
-uint8_t extend(uint32_t new_size, heap_t *heap);
-uint32_t alloc(uint32_t sz, uint8_t page_align, heap_t* heap);
+static uint8_t extend(uint32_t new_size, heap_t *heap);
+
 
 
 // Allocation //	

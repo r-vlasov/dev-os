@@ -32,7 +32,7 @@ extern void load_page_directory();			// load CR0, CR3 ( turn on paging:) )
 
 void paging_init()
 {
-	uint32_t mem_end_page = 0x1000000;  // The size of our memory
+	uint32_t mem_end_page = 0xFFFFF000;  // The size of our memory
 
     	nframes = mem_end_page / PAGE_SIZE;	// Number of page frames
     	page_frames = (uint32_t*)kmalloc(INDEX(nframes));

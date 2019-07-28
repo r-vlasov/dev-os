@@ -7,7 +7,14 @@ uint32_t kmalloc_int(uint32_t sz, int align, uint32_t *phys)
 	if (heap)
 	{
 		void *addr;
-		addr = dmalloc(sz);
+		if (align)
+		{
+			addr = dmalloc_align(sz);
+		}
+		else
+		{
+			addr = dmalloc(sz);
+		}
 		if (phys != 0)
 		{
 			page_t *page = get_page((uint32_t)addr, 0, kernel_directory);
