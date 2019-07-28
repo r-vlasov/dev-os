@@ -32,7 +32,7 @@ extern void load_page_directory();			// load CR0, CR3 ( turn on paging:) )
 
 void paging_init()
 {
-	uint32_t mem_end_page = 0x10000000;  // The size of our memory(16MB)
+	uint32_t mem_end_page = 0x1000000;  // The size of our memory
 
     	nframes = mem_end_page / PAGE_SIZE;	// Number of page frames
     	page_frames = (uint32_t*)kmalloc(INDEX(nframes));
@@ -44,7 +44,7 @@ void paging_init()
     	int i;
 	// there is because get_page changes placement_address
 	
-	for (i = KHEAP_START; i < KHEAP_START + KHEAP_START_SIZE; i += PAGE_SIZE)
+	for (i = KHEAP_START; i <= KHEAP_START + KHEAP_START_SIZE; i += PAGE_SIZE)
 	{
 		get_page(i, 1, kernel_directory);
 	}
@@ -72,7 +72,7 @@ void paging_init()
 	idt_handler(14, page_fault, 0x8E);
 	
 
-	for(uint32_t s = KHEAP_START; s < KHEAP_START + KHEAP_START_SIZE; s += PAGE_SIZE)
+	for(uint32_t s = KHEAP_START; s <= KHEAP_START + KHEAP_START_SIZE; s += PAGE_SIZE)
 	{
 	    	alloc_frame( get_page(s, 1, kernel_directory), 0, 0);
 	}

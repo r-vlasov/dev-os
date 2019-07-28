@@ -48,9 +48,10 @@ void heap_init();
 
 static void create_heap(uint32_t start, uint32_t size, uint32_t max, uint8_t readonly);
 static heap_chunk_t* find_chunk(uint32_t size, heap_t* heap);
+heap_chunk_t* find_chunk_align(uint32_t size, heap_t* heap);
 static void insert_chunk(heap_chunk_t* chunk, uint32_t size, heap_t* heap);
-static uint8_t extend(uint32_t new_size, heap_t *heap);
-uint32_t alloc(uint32_t sz, heap_t* heap);
+uint8_t extend(uint32_t new_size, heap_t *heap);
+uint32_t alloc(uint32_t sz, uint8_t page_align, heap_t* heap);
 
 
 // Allocation //	

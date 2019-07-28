@@ -4,8 +4,6 @@
 extern void gdt_init();
 extern void idt_init();
 extern void heap_init();
-
-
 #include "include/heap/kmalloc.h"
 extern uint32_t kmalloc(uint32_t);
 #define MBOOT_MAGIC	0x2BADB002
@@ -24,10 +22,9 @@ void kmain(int magic, struct multiboot *multiboot_specification)
 	idt_init();
 	drivers_init();
 	paging_init();
-	int* a = kmalloc(0x90000);
 
+	uint32_t a = find_chunk_align(0x20, heap);
 	tty_write_address(a);
-	tty_out_char('\n');
 	while(1);
 }
 

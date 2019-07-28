@@ -39,6 +39,34 @@ static heap_chunk_t* find_chunk(uint32_t size, heap_t* heap)
 	return result;
 }
 
+
+#include "../../../drv/teletype/headers/tty.h"
+
+heap_chunk_t* find_chunk_align(uint32_t size, heap_t* heap)
+{
+	heap_chunk_t* result = NULL;
+	int new_size;
+	int offset;
+	for (heap_chunk_t* chunk = heap->head; chunk != NULL && result == NULL; chunk = chunk->next)
+	{
+		if ( chunk->size >= size )
+		{
+			if ( ((uint32_t)chunk + SIZEOF(heap_chunk_t)) & 0xFFFFF000 != 0 )
+			{
+				offset = 0x1000 - ( (uint32_t)chunk + SIZEOF(heap_chunk_t) ) % 0x1000;
+				new_size = chunk->size - offset; 
+				if (new_size >= size)
+					result = chunk;
+			}
+			else
+			{
+				result = chunk;
+			}
+		}
+	}
+	return result;
+}
+
 static void insert_chunk(heap_chunk_t* chunk, uint32_t size, heap_t* heap)
 {
 	heap_chunk_t* temp = NEXT_CHUNK_PTR(chunk, size);
@@ -56,11 +84,8 @@ static void insert_chunk(heap_chunk_t* chunk, uint32_t size, heap_t* heap)
 	chunk->next = temp;
 	chunk->allocated = 1;
 }
-/*
 
-#include "../../../drv/teletype/headers/tty.h"
-
-static uint8_t extend(uint32_t new_size, heap_t *heap)
+uint8_t extend(uint32_t new_size, heap_t *heap)
 {
 	if (new_size > heap->max_addr - heap->start_addr)
 		return 0;
@@ -68,20 +93,15 @@ static uint8_t extend(uint32_t new_size, heap_t *heap)
 	new_size += PAGE_SIZE;
 	
 	uint32_t old_size = heap->end_addr - heap->start_addr;
-	for (int i = old_size; i < new_size; i+= PAGE_SIZE)
+	for (int i = old_size; i <= new_size; i+= PAGE_SIZE)
 	{
 		alloc_frame( get_page(heap->start_addr + i, 1, kernel_directory), 0, 0);
 	}
 	heap->end_addr = heap->start_addr + new_size;
 	return 1;
 }
-*/
 
 
-uint32_t alloc(uint32_t sz, heap_t* heap)
-{
-	return dmalloc(sz);
-}
 
 void* dmalloc(uint32_t size)
 {	
