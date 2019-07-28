@@ -50,7 +50,7 @@ static heap_chunk_t* find_chunk_align(uint32_t size, heap_t* heap)
 		{
 			if ( ((uint32_t)chunk + SIZEOF(heap_chunk_t)) & 0xFFFFF000 != 0 )
 			{
-				offset = 0x1000 - ( (uint32_t)chunk + SIZEOF(heap_chunk_t) ) % 0x1000;
+				offset = PAGE_SIZE - ( (uint32_t)chunk + SIZEOF(heap_chunk_t) ) % PAGE_SIZE;
 				new_size = chunk->size - offset; 
 				if (new_size >= size)
 					result = chunk;
@@ -88,7 +88,7 @@ static void insert_chunk(heap_chunk_t* chunk, uint32_t size, heap_t* heap)
 static heap_chunk_t* insert_chunk_align(heap_chunk_t* chunk, uint32_t size, heap_t* heap)
 {
 	uint32_t offset;
-	offset = 0x1000 - ( (uint32_t)chunk + 2 * SIZEOF(heap_chunk_t) ) % 0x1000;
+	offset = PAGE_SIZE - ( (uint32_t)chunk + 2 * SIZEOF(heap_chunk_t) ) % PAGE_SIZE;
 	insert_chunk(chunk, offset, heap);
 	chunk->allocated = 0;
 	insert_chunk(chunk->next, size, heap);

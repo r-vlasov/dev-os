@@ -15,10 +15,10 @@ uint32_t kmalloc_int(uint32_t sz, int align, uint32_t *phys)
 		{
 			addr = dmalloc(sz);
 		}
-		if (phys != 0)
+		if (phys != NULL)
 		{
 			page_t *page = get_page((uint32_t)addr, 0, kernel_directory);
-			*phys = page->frame*0x1000 + (uint32_t)addr & (- 0x1000);
+			*phys = page->frame*PAGE_SIZE + (uint32_t)addr & (-PAGE_SIZE);
 		}
 		return (uint32_t)addr;
 	}
