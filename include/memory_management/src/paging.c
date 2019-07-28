@@ -28,7 +28,19 @@ extern void idt_handler(uint8_t, void*, uint8_t);	// INT14 handler
 extern void load_page_directory();			// load CR0, CR3 ( turn on paging:) )
 
 
+
+#define SWITCH_PAGE_DIR(kernel_directory)	asm volatile(	"pushl	%eax\n");\
+						asm volatile(	"movl	%0, %%cr3\n" ::"r"(&kernel_directory->tablesPhysical));\
+						asm volatile(	"movl 	%cr0, %eax\n");\
+						asm volatile(	"orl	$(1 << 31), %eax\n");\
+						asm volatile(	"movl 	%eax, %cr0\n");\
+						asm volatile( 	"popl	%eax");	
+
+
+
+
 // Kernel space | page frame | page dir //
+
 
 void paging_init()
 {
@@ -48,6 +60,13 @@ void paging_init()
 	{
 		get_page(i, 1, kernel_directory);
 	}
+	
+	
+	for (i = KHEAP2_START; i <= KHEAP2_START + KHEAP_START_SIZE; i += PAGE_SIZE)
+	{
+		get_page(i, 1, kernel_directory);
+	}
+	
 	
 	/**
      	** Теперь нам необходимо тождественно отобразить
@@ -76,16 +95,19 @@ void paging_init()
 	{
 	    	alloc_frame( get_page(s, 1, kernel_directory), 0, 0);
 	}
+	for(uint32_t s = KHEAP2_START; s <= KHEAP2_START + KHEAP_START_SIZE; s += PAGE_SIZE)
+	{
+	    	alloc_frame( get_page(s, 1, kernel_directory), 0, 0);
+	}
 
-	asm volatile(	"pushl	%eax\n");
-	asm volatile(	"movl	%0, %%cr3\n" ::"r"(&kernel_directory->tablesPhysical));
-	asm volatile(	"movl 	%cr0, %eax\n");
-	asm volatile(	"orl	$(1 << 31), %eax\n");
-	asm volatile(	"movl 	%eax, %cr0\n");
-	asm volatile( 	"popl	%eax");	
+
+	// Initial paging
+	SWITCH_PAGE_DIR(kernel_directory);
+
 
 	// Heap initialization
-	heap_init();
+	heap_init(KHEAP_START, KHEAP_START_SIZE, KHEAP_MAX, 0, &heap0);
+	heap_init(KHEAP2_START, KHEAP2_START_SIZE, KHEAP_MAX, 0, &heap1);
 
 
 }

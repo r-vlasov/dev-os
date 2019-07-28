@@ -3,7 +3,6 @@
 #include "include/memory_management/headers/paging.h"
 extern void gdt_init();
 extern void idt_init();
-extern void heap_init();
 #include "include/heap/kmalloc.h"
 extern uint32_t kmalloc(uint32_t);
 #define MBOOT_MAGIC	0x2BADB002
@@ -31,7 +30,21 @@ void kmain(int magic, struct multiboot *multiboot_specification)
 	tty_out_char('\n');
 	s = kmalloc(0x200);
 	tty_write_address(s);
-	tty_out_char('\n');		while(1);
+	tty_out_char('\n');		
+	
+
+	s = dmalloc(0x200000, heap1);	
+	tty_write_address(s);
+tty_out_char('\n');		
+	s = dmalloc(0x200000, heap1);	
+	tty_write_address(s);
+tty_out_char('\n');		
+
+
+	while(1);
+
+
+
 }
 
 

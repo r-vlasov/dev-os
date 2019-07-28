@@ -4,16 +4,16 @@
 
 uint32_t kmalloc_int(uint32_t sz, int align, uint32_t *phys)
 {
-	if (heap)
+	if (heap1)
 	{
 		void *addr;
 		if (align)
 		{
-			addr = dmalloc_align(sz);
+			addr = dmalloc_align(sz, heap0);
 		}
 		else
 		{
-			addr = dmalloc(sz);
+			addr = dmalloc(sz, heap0);
 		}
 		if (phys != NULL)
 		{
@@ -51,8 +51,5 @@ uint32_t kmalloc(uint32_t sz)
 
 void kfree(uint32_t ptr)
 {
-	if (heap)
-	{
-		dfree(ptr);
-	}
+	dfree(ptr, heap0);
 }
