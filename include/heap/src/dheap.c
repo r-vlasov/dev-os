@@ -45,8 +45,8 @@ static heap_chunk_t* find_chunk(uint32_t size, heap_t* heap)
 heap_chunk_t* find_chunk_align(uint32_t size, heap_t* heap)
 {
 	heap_chunk_t* result = NULL;
-	int new_size;
-	int offset;
+	uint32_t new_size;
+	uint32_t offset;
 	for (heap_chunk_t* chunk = heap->head; chunk != NULL && result == NULL; chunk = chunk->next)
 	{
 		if ( chunk->size >= size )
@@ -67,6 +67,7 @@ heap_chunk_t* find_chunk_align(uint32_t size, heap_t* heap)
 	return result;
 }
 
+
 static void insert_chunk(heap_chunk_t* chunk, uint32_t size, heap_t* heap)
 {
 	heap_chunk_t* temp = NEXT_CHUNK_PTR(chunk, size);
@@ -84,6 +85,19 @@ static void insert_chunk(heap_chunk_t* chunk, uint32_t size, heap_t* heap)
 	chunk->next = temp;
 	chunk->allocated = 1;
 }
+
+
+
+heap_chunk_t* insert_chunk_align(heap_chunk_t* chunk, uint32_t size, heap_t* heap)
+{
+	uint32_t offset;
+	offset = 0x1000 - ( (uint32_t)chunk + 2 * SIZEOF(heap_chunk_t) ) % 0x1000;
+	insert_chunk(chunk, offset, heap);
+	chunk->allocated = 0;
+	insert_chunk(chunk->next, size, heap);
+	return chunk->next;
+}
+
 
 uint8_t extend(uint32_t new_size, heap_t *heap)
 {
@@ -109,6 +123,18 @@ void* dmalloc(uint32_t size)
 	insert_chunk(result, size, heap);
 	return ALLOC_DATA_PTR(result);
 }
+
+
+
+void* dmalloc_align(uint32_t size)
+{
+	heap_chunk_t* result1 = find_chunk_align(size, heap);
+//	tty_write_address(result1);
+//	tty_out_char('\n');
+	heap_chunk_t* result2 = insert_chunk_align(result1, size, heap);
+	return ALLOC_DATA_PTR(result2);
+}
+
 
 void dfree(void* pointer)
 {
