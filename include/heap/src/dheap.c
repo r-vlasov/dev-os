@@ -104,25 +104,32 @@ static uint8_t extend(uint32_t new_size, heap_t *heap)
 	new_size = new_size & 0xFFFFF000;
 	new_size += PAGE_SIZE;
 	
-
 	uint32_t old_size = heap->end_addr - heap->start_addr;
-//* KHEAP_START->obj1->obj2->obj3 so we should increse obj3 size, if it's not allocated *//
+
+	for (uint32_t i = old_size; i < new_size; i+= PAGE_SIZE)
+	{
+		alloc_frame( get_page(heap->start_addr + i, 1, kernel_directory), 0, 0);
+	}
+	
+	//* KHEAP_START->obj1->obj2->obj3 so we should increse obj3 size, if it's not allocated *//
 	heap_chunk_t* chunk;
 	for (chunk = heap->head; chunk->next != NULL; chunk = chunk->next);
+	tty_write_address(chunk);
+	tty_out_char('\n');
 	if ( chunk->allocated )
 	{
-		insert_chunk(chunk, new_size - old_size - SIZEOF(heap_chunk_t), heap);
-		chunk->allocated = 0;
+		heap_chunk_t* forw = NEXT_CHUNK_PTR(chunk, chunk->size);
+		forw->next = NULL;
+		forw->prev = chunk;
+		forw->size = new_size - old_size - SIZEOF(heap_chunk_t);
+		forw->allocated = 0;
 	}
 	else
 	{
 		chunk->size += new_size - old_size;
 	}
 //* *//	
-	for (uint32_t i = old_size; i < new_size; i+= PAGE_SIZE)
-	{
-		alloc_frame( get_page(heap->start_addr + i, 1, kernel_directory), 0, 0);
-	}
+	
 	heap->end_addr = heap->start_addr + new_size;
 	return 1;
 }
@@ -131,7 +138,18 @@ static uint8_t extend(uint32_t new_size, heap_t *heap)
 
 void* dmalloc(uint32_t size)
 {	
-	heap_chunk_t* result =  find_chunk(size, heap);
+	heap_chunk_t* result = find_chunk(size, heap);	
+	while (result == NULL)
+	{
+		if (HEAP_GROW(KHEAP_SIZE(heap)))
+		{
+			result = find_chunk(size, heap);
+		}
+		else
+		{
+			return NULL;
+		}
+	}	
 	insert_chunk(result, size, heap);
 	return ALLOC_DATA_PTR(result);
 }
@@ -140,9 +158,20 @@ void* dmalloc(uint32_t size)
 
 void* dmalloc_align(uint32_t size)
 {
-	heap_chunk_t* result1 = find_chunk_align(size, heap);
-	heap_chunk_t* result2 = insert_chunk_align(result1, size, heap);
-	return ALLOC_DATA_PTR(result2);
+	heap_chunk_t* result = find_chunk_align(size, heap);
+	while (result == NULL)
+	{
+		if (HEAP_GROW(KHEAP_SIZE(heap)))
+		{
+			result = find_chunk_align(size, heap);
+		}
+		else
+		{
+			return NULL;
+		}
+	}	
+	result = insert_chunk_align(result, size, heap);
+	return ALLOC_DATA_PTR(result);
 }
 
 

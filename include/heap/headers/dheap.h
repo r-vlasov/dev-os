@@ -14,7 +14,7 @@
 #define KHEAP_START		0xc000000
 #define KHEAP_START_SIZE	0x100000
 #define KHEAP_MAX		0x500000
-#define KHEAP_PIECE		0x100000
+#define KHEAP_GROW_SIZE		0x100000
 #define KHEAP_SIZE(heap)	(heap->end_addr - heap->start_addr)
 
 
@@ -22,7 +22,7 @@
 #define ALLOC_DATA_PTR(res) 		(void*)(((uint32_t)res) + SIZEOF(heap_chunk_t))
 #define SIZEOF(a)			(sizeof(a))
 #define NEXT_CHUNK_PTR(p,s)		((heap_chunk_t*)(((uint32_t)p) + (sizeof(heap_chunk_t)) + s))
-#define INCREASE_SIZE(size, end, max)	(((max - end) > KHEAP_PIECE) ? (size + KHEAP_PIECE) : (size + max - end))
+#define HEAP_GROW(size)			(((size + KHEAP_GROW_SIZE) > KHEAP_MAX) ? 0 : extend((size + KHEAP_GROW_SIZE), heap)) 
 
 
 typedef struct MemChunk {

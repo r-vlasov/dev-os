@@ -22,11 +22,16 @@ void kmain(int magic, struct multiboot *multiboot_specification)
 	idt_init();
 	drivers_init();
 	paging_init();
-	kmalloc(0x250000);
-
-	uint32_t k = kmalloc(0x10);
-	tty_write_address(k);
-	while(1);
+	
+	uint32_t s = kmalloc(0x200000);
+	tty_write_address(s);
+	tty_out_char('\n');
+	s = kmalloc(0x200);
+	tty_write_address(s);
+	tty_out_char('\n');
+	s = kmalloc(0x200);
+	tty_write_address(s);
+	tty_out_char('\n');		while(1);
 }
 
 
