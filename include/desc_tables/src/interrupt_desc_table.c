@@ -35,14 +35,14 @@ Int_Node idt[IDT_SIZE];
 
 void idt_handler(uint8_t index, void* handler, uint8_t type)
 {
-	asm volatile("pushf \n"); //PUSHF and POPF saves the contents of the flags register
+	asm volatile("pushf\n cli"); //PUSHF and POPF saves the contents of the flags register
 	uint32_t address = (unsigned long)handler;
 	idt[index].selector = 0x08;
 	idt[index].lowerbits = address & 0xFFFF;
 	idt[index].higherbits = (address & 0xffff0000) >> 16;
 	idt[index].type = type;
 	idt[index].reserved = 0;
-	asm volatile("popf \n");
+	asm volatile("popf\n sti");
 }
 
 void timer();
@@ -97,6 +97,7 @@ void idt_init()
 void isr(registers_t regs)
 {
 	tty_out_char('0' + regs.number);
+	asm volatile("sti");
 }
 
 

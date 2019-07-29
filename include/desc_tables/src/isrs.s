@@ -233,7 +233,6 @@ __common_handler:
 
 	popa
 	add esp, 8  ; Clear the stack of error code and interrupt number
-	sti
 	iret
 	
 
