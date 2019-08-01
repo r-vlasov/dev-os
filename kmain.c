@@ -56,11 +56,13 @@ void kmain(multiboot_header_t *s, uint32_t initial_stack)
 	gdt_init();
 	idt_init();
 	drivers_init();
+	tty_write_address(123);
 	paging_init();
+	tty_write_address(123);
+//	current_directory = kernel_directory;
 //	task_init();
-	
-//	current_directory = clone_directory(kernel_directory);
-//	tty_write_string(current_directory);
+//	tty_write_address(fork());
+//	switch_task();
 	
 //	tty_write_address(memcmp(current_directory, kernel_directory, sizeof(page_directory_t)));
 	while(1);

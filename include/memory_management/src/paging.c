@@ -23,13 +23,14 @@
 */
 
 extern page_directory_t* kernel_directory;
+extern page_directory_t* current_directory;
 extern uint32_t placement_address;   			// Space after kernel_end(initial in linker script 
 extern void idt_handler(uint8_t, void*, uint8_t);	// INT14 handler
 extern void load_page_directory();			// load CR0, CR3 ( turn on paging:) )
 
 
 
-#define SWITCH_PAGE_DIR(dir)			current_directory = dir; \
+#define INIT_PAGING(dir)			current_directory = dir; \
 						asm volatile(	"pushl	%eax\n");\
 						asm volatile(	"movl	%0, %%cr3\n" ::"r"(dir->physicalAddress));\
 						asm volatile(	"movl 	%cr0, %eax\n");\
@@ -37,6 +38,7 @@ extern void load_page_directory();			// load CR0, CR3 ( turn on paging:) )
 						asm volatile(	"movl 	%eax, %cr0\n");\
 						asm volatile( 	"popl	%eax");	
 
+#define SWITCH_PAGE_DIRECTORY(dir)		asm volatile("movl	%0, %%cr3\n" ::"r"(dir->physicalAddress));
 
 
 #define DISABLE_PAGING()			asm volatile(	"pushf \n push 	%edx\n 		mov %cr0, %edx\n");\
@@ -62,7 +64,6 @@ void paging_init()
 
     	kernel_directory = (page_directory_t*)kmalloc_a(sizeof(page_directory_t));
     	memset(kernel_directory, 0, sizeof(page_directory_t));
-
 	kernel_directory->physicalAddress = (uint32_t)kernel_directory->tablesPhysical;
 
     	int i;
@@ -93,24 +94,27 @@ void paging_init()
     	}
 
 
-	// Initializing page fault handler
-	idt_handler(14, page_fault, 0x8E);
-	
+
 
 	for(uint32_t s = KHEAP_START; s <= KHEAP_START + KHEAP_START_SIZE; s += PAGE_SIZE)
 	{
 	    	alloc_frame( get_page(s, 1, kernel_directory), 0, 0);
 	}
+	
+	// Initializing page fault handler
+	idt_handler(14, page_fault, 0x8E);
+	
+	
 	// Initial paging
-	SWITCH_PAGE_DIR(kernel_directory);
+	INIT_PAGING(kernel_directory);
 
 
 	// Heap initialization
 	heap_init(KHEAP_START, KHEAP_START_SIZE, KHEAP_MAX, 0, &heap0);
 
 	
-	current_directory = clone_directory(kernel_directory);
-	SWITCH_PAGE_DIR(current_directory);
+	// Switch page
+	SWITCH_PAGE_DIRECTORY(current_directory);
 }
 
 page_directory_t *clone_directory(page_directory_t *src)
@@ -124,9 +128,18 @@ page_directory_t *clone_directory(page_directory_t *src)
 
 	for (uint32_t i = 0; i < 1024; i++)
 	{
-		uint32_t phys;
-		dir->tables[i] = clone_table(src->tables[i], &phys);
-		dir->tablesPhysical[i] = phys | 0x07;
+		if (kernel_directory->tables[i] == src->tables[i])
+		{	
+
+			dir->tables[i] = src->tables[i];
+			dir->tablesPhysical[i] = src->tablesPhysical[i];
+		}
+		else
+		{
+			uint32_t phys;
+			dir->tables[i] = clone_table(src->tables[i], &phys);
+			dir->tablesPhysical[i] = phys | 0x07;
+		}
 	}
 	return dir;
 }
