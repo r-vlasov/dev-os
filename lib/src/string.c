@@ -15,6 +15,7 @@ void*	memchr	(const void* memory, int value, size_t count)
 	return NULL;
 }
 
+extern void tty_write_address(uint32_t);
 /*	The mrmcmp() function returns an integer greater than, equal to, or less than zero, accordingly as the object pointed to by str1 is greater than, equal to, or less than the object pointed to by str2	*/
 int	memcmp (const void* str1, const void* str2, size_t count)
 {
@@ -23,20 +24,24 @@ int	memcmp (const void* str1, const void* str2, size_t count)
 	while (count--)
 	{
 		if ( ch1[count] == ch2[count])
+		{
 			continue;
+		}
 		else
-			return ch1[count] - ch2[count];
+		{
+			return ch2[count] - ch1[count];
+		}
 	}
-	return 0;
+	return 0x0;
 }
 
 /*	The memcpy() function shall copy the first n bytes pointed to by src to the buffer pointed to by dest	*/
 void* 	memcpy(void* dest, const void* src, size_t count)
 {
-	char *dch = dest;
-	const char *sch = src;
+	char *d = dest;
+	const char *s = src;
 	while (count--)
-		*dch++ = *sch++;
+		*d++ = *s++;
 	return dest;
 }
 

@@ -3,7 +3,7 @@
 #include "../../memory_management/headers/page_frame.h"
 
 extern	page_directory_t* kernel_directory;
-extern 	heap_t *heap;
+extern 	heap_t *heap0;
 extern 	page_t* get_page(uint32_t address, int make, page_directory_t *dir);
 extern 	void alloc_frame(page_t*, uint8_t, uint8_t);
 

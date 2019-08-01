@@ -14,10 +14,6 @@
 #define KHEAP_START		0xC0000000
 #define KHEAP_START_SIZE	0x100000
 
-
-#define KHEAP2_START		0xB0000000
-#define KHEAP2_START_SIZE	0x100000
-
 #define KHEAP_MAX		0x500000
 #define KHEAP_GROW_SIZE		0x100000
 #define KHEAP_SIZE(heap)	(heap->end_addr - heap->start_addr)
@@ -48,8 +44,6 @@ typedef struct kerHeap  {
 
 
 heap_t *heap0;
-heap_t *heap1;
-
 
 void heap_init(uint32_t start, uint32_t size, uint32_t max, uint8_t readonly, heap_t** theap);
 

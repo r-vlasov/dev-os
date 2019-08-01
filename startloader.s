@@ -21,12 +21,11 @@ section ._mbHeader
 
 section .text
     start:				; the loader label (defined as entry point in linker script)    
-        cli
-	mov	esp, kernel_stack + KERNEL_STACK_SIZE     
-        push	ebx			; push into the stack the address of the structure recieved from the loader	
-	push 	eax 			; push into the stack the identifier
-        call kmain      ; call the function, the result will be in eax
-	hlt	
+	mov	esp, kernel_stack + KERNEL_STACK_SIZE    
+        push    esp 
+        push	ebx			; push into the stack the address of the structure recieved from the loade;r	
+	;push 	eax 			; push into the stack the identifier
+        call kmain  
     
 section .bss
     align 4                                     ; align at 4 bytes

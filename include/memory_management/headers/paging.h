@@ -61,16 +61,20 @@ typedef struct {
 //
  
 page_directory_t* kernel_directory;
-
+page_directory_t* current_directory;
 //
 
 /* Functions */
 
 	void paging_init();			// set up environment
+	
+	page_directory_t *clone_directory(page_directory_t* src);
+	static page_table_t *clone_table(page_table_t* src, uint32_t* physAddr);
+
 
 	page_t* get_page(uint32_t address, int make, page_directory_t *dir); // Retrieves a pointer to the page required. If make == 1 and the page-table isn't created than it will create.
 
 	void page_fault(registers_t regs); // See "desc_tables/src/isrs.s" page fault
-
+	
 
 #endif

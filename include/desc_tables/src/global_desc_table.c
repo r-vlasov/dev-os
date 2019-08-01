@@ -5,18 +5,57 @@ extern void load_gdt(void*);
 
 GDT_Node GDT[5];
 
+
+
+
+
+struct TSS_STRUCT {
+
+        unsigned int back_link;
+
+        unsigned int esp0, ss0;
+
+        unsigned int esp1, ss1;
+
+        unsigned int esp2, ss2;
+
+        unsigned int cr3;
+
+        unsigned int eip;
+
+        unsigned int eflags;
+
+        unsigned int eax,ecx,edx,ebx;
+
+        unsigned int esp, ebp;
+
+        unsigned int esi, edi;
+
+        unsigned int es, cs, ss, ds, fs, gs;
+
+        unsigned int ldt;
+
+        unsigned int trace_bitmap;
+
+};
+
+
+struct TSS_STRUCT tss;
+
 GDTR gdtr;
 
 void gdt_init()
 {
-    gdtr.limit = (sizeof(GDT_Node)*5) - 1;
+    tss.esp0 = 0xE0000000;
+    tss.ss0 = 0x10;
+    gdtr.limit = (sizeof(GDT_Node)*5);
     gdtr.base  = (uint32_t)&GDT;
 
     gdt_set_gate(0, 0, 0, 0, 0);                // Нулевой сегмент
     gdt_set_gate(1, 0, 0xFFFFFFFF, 0x9A, 0xCF);    // Сегмент кода
     gdt_set_gate(2, 0, 0xFFFFFFFF, 0x92, 0xCF);    // Сегмент данных
-    gdt_set_gate(3, 0, 0xFFFFFFFF, 0xFA, 0xCF);    // Сегмент кода уровня пользовательских процессов
-    gdt_set_gate(4, 0, 0xFFFFFFFF, 0xF2, 0xCF);    // Сегмент данных уровня пользовательских процессов
+    gdt_set_gate(3, &tss, sizeof(struct TSS_STRUCT), 0x89, 0xCF);    // Сегмент кода уровня пользовательских процессов
+    gdt_set_gate(4, 0, 0xFFFFFFFF, 0x89, 0xCF);    // Сегмент данных уровня пользовательских процессов
 
     load_gdt(&gdtr);  // Loading gdt (asm function)
 }

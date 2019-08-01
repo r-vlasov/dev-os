@@ -4,7 +4,7 @@
 
 uint32_t kmalloc_int(uint32_t sz, int align, uint32_t *phys)
 {
-	if (heap1)
+	if (heap0)
 	{
 		void *addr;
 		if (align)

@@ -11,40 +11,59 @@ extern uint32_t kmalloc(uint32_t);
  *	that tells us the kernel was loaded by compatible bootloader 		
 */
 
-void kmain(int magic, struct multiboot *multiboot_specification)
+
+
+typedef uint32_t u32int;
+
+struct multiboot
 {
-	if (magic != MBOOT_MAGIC)
-	{
-		return;
-	}
+    u32int flags;
+    u32int mem_lower;
+    u32int mem_upper;
+    u32int boot_device;
+    u32int cmdline;
+    u32int mods_count;
+    u32int mods_addr;
+    u32int num;
+    u32int size;
+    u32int addr;
+    u32int shndx;
+    u32int mmap_length;
+    u32int mmap_addr;
+    u32int drives_length;
+    u32int drives_addr;
+    u32int config_table;
+    u32int boot_loader_name;
+    u32int apm_table;
+    u32int vbe_control_info;
+    u32int vbe_mode_info;
+    u32int vbe_mode;
+    u32int vbe_interface_seg;
+    u32int vbe_interface_off;
+    u32int vbe_interface_len;
+}  __attribute__((packed));
+
+typedef struct multiboot_header multiboot_header_t;
+
+
+extern page_directory_t* kernel_directory;
+extern page_directory_t* current_directory;
+
+uint32_t initial_esp;
+void kmain(multiboot_header_t *s, uint32_t initial_stack)
+{
+    initial_esp = initial_stack;
 	gdt_init();
 	idt_init();
 	drivers_init();
 	paging_init();
+//	task_init();
 	
-	uint32_t s = kmalloc(0x200000);
-	tty_write_address(s);
-	tty_out_char('\n');
-	s = kmalloc(0x200);
-	tty_write_address(s);
-	tty_out_char('\n');
-	s = kmalloc(0x200);
-	tty_write_address(s);
-	tty_out_char('\n');		
+//	current_directory = clone_directory(kernel_directory);
+//	tty_write_string(current_directory);
 	
-
-	s = dmalloc(0x200000, heap1);	
-	tty_write_address(s);
-tty_out_char('\n');		
-	s = dmalloc(0x200000, heap1);	
-	tty_write_address(s);
-tty_out_char('\n');		
-
-
+//	tty_write_address(memcmp(current_directory, kernel_directory, sizeof(page_directory_t)));
 	while(1);
-
-
-
 }
 
 
