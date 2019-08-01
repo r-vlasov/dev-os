@@ -1,7 +1,6 @@
     global start;		    ; The entry symbol for ELF
-    global read_eip;
     extern kmain; 		    ; kmain is defined in C-file
-
+    global GET_EIP;
     global multiboot_spec 	    ; so we need to use it in C-code
 
 
@@ -27,10 +26,10 @@ section .text
 	;push 	eax 			; push into the stack the identifier
         call kmain  
 
-    read_eip:
-	pop 	eax
+
+    GET_EIP:
+	pop	eax
 	jmp	eax
-	ret
 	
     
 section .bss

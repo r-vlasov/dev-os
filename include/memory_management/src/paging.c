@@ -98,7 +98,7 @@ void paging_init()
 
 	for(uint32_t s = KHEAP_START; s <= KHEAP_START + KHEAP_START_SIZE; s += PAGE_SIZE)
 	{
-	    	alloc_frame( get_page(s, 1, kernel_directory), 0, 0);
+	    	alloc_frame( get_page(s, 1, kernel_directory), 0, 0 );
 	}
 	
 	// Initializing page fault handler
@@ -128,6 +128,10 @@ page_directory_t *clone_directory(page_directory_t *src)
 
 	for (uint32_t i = 0; i < 1024; i++)
 	{
+		if (src->tables[i] == NULL)
+		{
+			continue;
+		}
 		if (kernel_directory->tables[i] == src->tables[i])
 		{	
 
