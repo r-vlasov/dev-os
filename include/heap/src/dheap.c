@@ -46,7 +46,7 @@ static heap_chunk_t* find_chunk_align(uint32_t size, heap_t* theap)
 	uint32_t offset;
 	for (heap_chunk_t* chunk = theap->head; chunk != NULL && result == NULL; chunk = chunk->next)
 	{
-		if ( chunk->size >= size )
+		if ( chunk->size >= size && !chunk->allocated )
 		{
 			if ( ((uint32_t)chunk + SIZEOF(heap_chunk_t)) & 0xFFFFF000 != 0 )
 			{
@@ -90,9 +90,14 @@ static heap_chunk_t* insert_chunk_align(heap_chunk_t* chunk, uint32_t size, heap
 	uint32_t offset;
 	offset = PAGE_SIZE - ( (uint32_t)chunk + 2 * SIZEOF(heap_chunk_t) ) % PAGE_SIZE;
 	insert_chunk(chunk, offset, theap);
+//	tty_write_address(chunk->next);
+	tty_out_char('\n');
 	chunk->allocated = 0;
 	insert_chunk(chunk->next, size, theap);
 	return chunk->next;
+//	insert_chunk(chunk, size, theap);
+//	return chunk;
+
 }
 
 
@@ -154,9 +159,13 @@ void* dmalloc(uint32_t size, heap_t* theap)
 
 
 
+
 void* dmalloc_align(uint32_t size, heap_t* theap)
 {
+//	tty_write_address(size);
+//	tty_out_char(' ');
 	heap_chunk_t* result = find_chunk_align(size, theap);
+//	tty_write_address(result);
 	while (result == NULL)
 	{
 		if (HEAP_GROW(KHEAP_SIZE(theap), theap))

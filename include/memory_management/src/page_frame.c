@@ -6,14 +6,17 @@ void	set_frame_bitmap(uint32_t i)
 {
 	page_frames[INDEX(i)] |= 1 << OFFSET(i);
 }
+
 void 	unset_frame_bitmap(uint32_t i)
 {
 	page_frames[INDEX(i)] &= ~(1 << OFFSET(i));
 }
+
 int 	get_frame_bitmap(uint32_t i)
 {
 	return page_frames[INDEX(i)] & (1 << OFFSET(i));
 }
+
 int 	search_clear_bit() 
 {
 	uint32_t mask;

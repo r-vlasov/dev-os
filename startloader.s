@@ -2,6 +2,7 @@
     extern kmain; 		    ; kmain is defined in C-file
     global GET_EIP;
     global multiboot_spec 	    ; so we need to use it in C-code
+    global copy_page_physical
 
 
     MBOOT_HEADER_MAGIC 	equ 	0x1BADB002   					; define the magic number constant
@@ -30,7 +31,41 @@ section .text
     GET_EIP:
 	pop	eax
 	jmp	eax
-	
+
+
+
+copy_page_physical:
+   push ebx              ; According to __cdecl, we must preserve the contents of EBX.
+   pushf                 ; push EFLAGS, so we can pop it and reenable interrupts
+                         ; later, if they were enabled anyway.
+   cli                   ; Disable interrupts, so we aren't interrupted.
+                         ; Load these in BEFORE we disable paging!
+   mov ebx, [esp+12]     ; Source address
+   mov ecx, [esp+16]     ; Destination address
+
+   mov edx, cr0          ; Get the control register...
+   and edx, 0x7fffffff   ; and...
+   mov cr0, edx          ; Disable paging.
+
+   mov edx, 1024         ; 1024*4bytes = 4096 bytes to copy
+
+.loop:
+   mov eax, [ebx]        ; Get the word at the source address
+   mov [ecx], eax        ; Store it at the dest address
+   add ebx, 4            ; Source address += sizeof(word)
+   add ecx, 4            ; Dest address += sizeof(word)
+   dec edx               ; One less word to do
+   jnz .loop
+
+   mov edx, cr0          ; Get the control register again
+   or  edx, 0x80000000   ; and...
+   mov cr0, edx          ; Enable paging.
+
+   popf                  ; Pop EFLAGS back.
+   pop ebx               ; Get the original value of EBX back.
+   ret
+
+
     
 section .bss
     align 4                                     ; align at 4 bytes

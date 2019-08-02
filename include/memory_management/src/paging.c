@@ -32,13 +32,13 @@ extern void load_page_directory();			// load CR0, CR3 ( turn on paging:) )
 
 #define INIT_PAGING(dir)			current_directory = dir; \
 						asm volatile(	"pushl	%eax\n");\
-						asm volatile(	"movl	%0, %%cr3\n" ::"r"(dir->physicalAddress));\
+						asm volatile(	"movl	%0, %%cr3\n" ::"r"(current_directory->physicalAddress));\
 						asm volatile(	"movl 	%cr0, %eax\n");\
-						asm volatile(	"orl	$(1 << 31), %eax\n");\
+						asm volatile(	"orl	$0x80000000, %eax\n");\
 						asm volatile(	"movl 	%eax, %cr0\n");\
 						asm volatile( 	"popl	%eax");	
 
-#define SWITCH_PAGE_DIRECTORY(dir)		asm volatile("movl	%0, %%cr3\n" ::"r"(dir->physicalAddress));
+#define SWITCH_PAGE_DIRECTORY(dir)		asm volatile("	movl	%0, %%cr3\n" ::"r"(dir->physicalAddress));
 
 
 #define DISABLE_PAGING()			asm volatile(	"pushf \n push 	%edx\n 		mov %cr0, %edx\n");\
@@ -65,7 +65,7 @@ void paging_init()
     	kernel_directory = (page_directory_t*)kmalloc_a(sizeof(page_directory_t));
     	memset(kernel_directory, 0, sizeof(page_directory_t));
 	kernel_directory->physicalAddress = (uint32_t)kernel_directory->tablesPhysical;
-
+	current_directory = kernel_directory;
     	int i;
 	// there is because get_page changes placement_address
 	
@@ -89,11 +89,9 @@ void paging_init()
     	{
         // Код ядра доступен для чтения но не для записи
         // из пространства пользователя
-        	alloc_frame( get_page(i, 1, kernel_directory),0,0);
+        	alloc_frame( get_page(i, 1, kernel_directory), 0, 0);
         	i += PAGE_SIZE;
     	}
-
-
 
 
 	for(uint32_t s = KHEAP_START; s <= KHEAP_START + KHEAP_START_SIZE; s += PAGE_SIZE)
@@ -104,7 +102,6 @@ void paging_init()
 	// Initializing page fault handler
 	idt_handler(14, page_fault, 0x8E);
 	
-	
 	// Initial paging
 	INIT_PAGING(kernel_directory);
 
@@ -112,48 +109,47 @@ void paging_init()
 	// Heap initialization
 	heap_init(KHEAP_START, KHEAP_START_SIZE, KHEAP_MAX, 0, &heap0);
 
-	
-	// Switch page
-	SWITCH_PAGE_DIRECTORY(current_directory);
+	current_directory = clone_directory(kernel_directory);
+	page_directory_t* dirs = clone_directory(current_directory);
+	SWITCH_PAGE_DIRECTORY(dirs);
 }
+
+uint32_t phys;
 
 page_directory_t *clone_directory(page_directory_t *src)
 {
-	uint32_t phys;
-
 	page_directory_t *dir = (page_directory_t*) kmalloc_ap(sizeof(page_directory_t), &phys);
 	memset(dir, 0, sizeof(page_directory_t));
-	uint32_t off = (uint32_t)dir->tablesPhysical - (uint32_t)dir;
-	dir->physicalAddress = phys + off;
 
-	for (uint32_t i = 0; i < 1024; i++)
+	dir->physicalAddress = phys + (uint32_t)dir->tablesPhysical - (uint32_t)dir;
+
+	for (int i = 0; i < 1024; i++)
 	{
 		if (src->tables[i] == NULL)
-		{
 			continue;
-		}
-		if (kernel_directory->tables[i] == src->tables[i])
-		{	
-
+		if (src->tables[i] == kernel_directory->tables[i])
+		{
 			dir->tables[i] = src->tables[i];
 			dir->tablesPhysical[i] = src->tablesPhysical[i];
+			continue;
 		}
 		else
 		{
-			uint32_t phys;
-			dir->tables[i] = clone_table(src->tables[i], &phys);
-			dir->tablesPhysical[i] = phys | 0x07;
+			uint32_t phys2;
+			dir->tables[i] = clone_table(src->tables[i], &phys2);
+			dir->tablesPhysical[i] = phys2 | 0x07;
+			continue;
 		}
 	}
 	return dir;
 }
 
 
-
+extern copy_page_physical(uint32_t, uint32_t);
 static page_table_t* clone_table(page_table_t *src, uint32_t *physAddr)
 {
 	page_table_t* table = (page_table_t*)kmalloc_ap(sizeof(page_table_t), physAddr);
-	memset(table, 0, sizeof(page_directory_t));
+	memset(table, 0, sizeof(page_table_t));
 
 	for (int i = 0; i < 1024; i++)
 	{
@@ -168,9 +164,7 @@ static page_table_t* clone_table(page_table_t *src, uint32_t *physAddr)
 	
 	
 			asm volatile("cli");
-			
 			DISABLE_PAGING();
-			
 			asm volatile("	\n		\
 				push %%ebx \n		\
 				push %%ecx \n		\
@@ -186,8 +180,10 @@ static page_table_t* clone_table(page_table_t *src, uint32_t *physAddr)
 				jnz loop" :: "r"(src->pages[i].frame * 0x1000), "r"(table->pages[i].frame * 0x1000));
 			
 			ENABLE_PAGING();
-			
+		//	tty_write_address(9);
 			asm volatile("sti");
+		//	tty_write_address(9);
+		//	copy_page_physical(src->pages[i].frame*PAGE_SIZE, table->pages[i].frame*PAGE_SIZE);
 		}
 	}
 	return table;
@@ -198,7 +194,7 @@ page_t *get_page(uint32_t address, int make, page_directory_t *dir)
 {
        	uint32_t frame_index = address / (uint32_t) PAGE_SIZE;
 	// Находим таблицу, содержащую адрес
-	uint32_t table_index = frame_index / (uint32_t) __PAGES_IN_PAGETABLE_LINE;
+	uint32_t table_index = frame_index / (uint32_t) 1024;
 	if (dir->tables[table_index]) // Если таблица уже создана
 		return &dir->tables[table_index]->pages[frame_index % (uint32_t)1024];
 	else if(make)
