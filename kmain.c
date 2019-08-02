@@ -58,14 +58,9 @@ void kmain(multiboot_header_t *s, uint32_t initial_stack)
 	drivers_init();
 //	tty_write_address(123);
 	paging_init();
-	int a;
-	tty_write_address(kmalloc_ap(0x2004, &a));
-	tty_write_address(kmalloc_ap(0x2004, &a));
-
-//	task_init();
-//	fork();
-//	tty_write_address(a);
-//	switch_task();
+	task_init();
+	fork();
+	switch_task();
 //	tty_write_address(memcmp(current_directory, kernel_directory, sizeof(page_directory_t)));
 //	current_directory = kernel_directory;
 //	task_init();	tty_write_address(fork());

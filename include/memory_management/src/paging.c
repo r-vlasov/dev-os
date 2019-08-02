@@ -109,9 +109,10 @@ void paging_init()
 	// Heap initialization
 	heap_init(KHEAP_START, KHEAP_START_SIZE, KHEAP_MAX, 0, &heap0);
 
+
 	current_directory = clone_directory(kernel_directory);
-	page_directory_t* dirs = clone_directory(current_directory);
-	SWITCH_PAGE_DIRECTORY(dirs);
+	current_directory = clone_directory(current_directory);
+	SWITCH_PAGE_DIRECTORY(current_directory);
 }
 
 
