@@ -114,10 +114,10 @@ void paging_init()
 	SWITCH_PAGE_DIRECTORY(dirs);
 }
 
-uint32_t phys;
 
 page_directory_t *clone_directory(page_directory_t *src)
 {
+	uint32_t phys;
 	page_directory_t *dir = (page_directory_t*) kmalloc_ap(sizeof(page_directory_t), &phys);
 	memset(dir, 0, sizeof(page_directory_t));
 
@@ -145,7 +145,6 @@ page_directory_t *clone_directory(page_directory_t *src)
 }
 
 
-extern copy_page_physical(uint32_t, uint32_t);
 static page_table_t* clone_table(page_table_t *src, uint32_t *physAddr)
 {
 	page_table_t* table = (page_table_t*)kmalloc_ap(sizeof(page_table_t), physAddr);
@@ -180,10 +179,7 @@ static page_table_t* clone_table(page_table_t *src, uint32_t *physAddr)
 				jnz loop" :: "r"(src->pages[i].frame * 0x1000), "r"(table->pages[i].frame * 0x1000));
 			
 			ENABLE_PAGING();
-		//	tty_write_address(9);
 			asm volatile("sti");
-		//	tty_write_address(9);
-		//	copy_page_physical(src->pages[i].frame*PAGE_SIZE, table->pages[i].frame*PAGE_SIZE);
 		}
 	}
 	return table;
