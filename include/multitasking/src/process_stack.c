@@ -1,9 +1,10 @@
 #include "../headers/process_stack.h"
 
 
-extern	uint32_t 		initial_esp;
 extern	void*			current_directory;
-void move_stack(void *new_stack_start, uint32_t size)
+
+
+void move_stack(void *new_stack_start, void* old_stack_start, uint32_t size)
 {
 	uint32_t i;
 	for (i = (uint32_t) new_stack_start; i >= (uint32_t) new_stack_start - size; i -= 0x1000)
@@ -11,21 +12,24 @@ void move_stack(void *new_stack_start, uint32_t size)
 			alloc_frame(get_page(i, 1, current_directory), 0, 1);
 	}
 
+
 	uint32_t old_stack_pointer, old_base_pointer, offset;
 	
 	asm volatile("mov %%esp, %0" : "=r"(old_stack_pointer));
 	asm volatile("mov %%ebp, %0" : "=r"(old_base_pointer));
 
-	offset = (uint32_t)new_stack_start - initial_esp;
+	uint32_t init_esp = (uint32_t)old_stack_start;
+
+	offset = (uint32_t)new_stack_start - init_esp;
 	uint32_t new_stack_pointer = old_stack_pointer + offset;
 	uint32_t new_base_pointer = old_base_pointer + offset;
 
-	memcpy((void*)new_stack_pointer, (void*)old_stack_pointer, initial_esp - old_stack_pointer);
+	memcpy((void*)new_stack_pointer, (void*)old_stack_pointer, init_esp - old_stack_pointer);
 
 	for (int i = (uint32_t) new_stack_start; i > (uint32_t) new_stack_start - size; i -= 4)
 	{
 		uint32_t tmp = *(uint32_t*)i;
-		if ((old_stack_pointer < tmp) && (tmp < initial_esp))
+		if ((old_stack_pointer < tmp) && (tmp < init_esp))
 		{
 			tmp = tmp + offset;
 			uint32_t *tmp2 = (uint32_t*)i;
@@ -38,7 +42,7 @@ void move_stack(void *new_stack_start, uint32_t size)
 
 
 
-void copy_stack(void *new_stack_start, uint32_t size)
+void copy_stack(void *new_stack_start, void* old_stack_start, uint32_t size)
 {
 	uint32_t i;
 	for (i = (uint32_t) new_stack_start; i >= (uint32_t) new_stack_start - size; i -= 0x1000)
@@ -50,17 +54,19 @@ void copy_stack(void *new_stack_start, uint32_t size)
 	
 	asm volatile("mov %%esp, %0" : "=r"(old_stack_pointer));
 	asm volatile("mov %%ebp, %0" : "=r"(old_base_pointer));
-
-	offset = (uint32_t)new_stack_start - initial_esp;
+	
+	uint32_t init_esp = (uint32_t) old_stack_start;
+	
+	offset = (uint32_t)new_stack_start - init_esp;
 	uint32_t new_stack_pointer = old_stack_pointer + offset;
 	uint32_t new_base_pointer = old_base_pointer + offset;
 
-	memcpy((void*)new_stack_pointer, (void*)old_stack_pointer, initial_esp - old_stack_pointer);
+	memcpy((void*)new_stack_pointer, (void*)old_stack_pointer, init_esp - old_stack_pointer);
 
 	for (int i = (uint32_t) new_stack_start; i > (uint32_t) new_stack_start - size; i -= 4)
 	{
 		uint32_t tmp = *(uint32_t*)i;
-		if ((old_stack_pointer < tmp) && (tmp < initial_esp))
+		if ((old_stack_pointer < tmp) && (tmp < init_esp))
 		{
 			tmp = tmp + offset;
 			uint32_t *tmp2 = (uint32_t*)i;

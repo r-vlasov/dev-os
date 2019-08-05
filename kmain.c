@@ -62,47 +62,38 @@ void kmain(multiboot_header_t *mboot, uint32_t mboot_mag, uint32_t initial_stack
 	drivers_init();
 	paging_init();
 	task_init();
+
 	int a = fork();
-	if (a)
+	if ( a != 0)
 	{
-		tty_write_address(a);
+		tty_write_address(a);	
 		switch_task();
 	}
 	else
-	{
-		tty_write_address(a);
-		switch_task();
+	{ 	
+		int b = fork();
+		if (b != 0)
+		{
+			tty_write_address(b);
+			switch_task();
+
+		}
+		else
+		{
+			int c = fork();
+			if (c != 0)
+			{
+				tty_write_address(c);
+				switch_task();
+			}
+			else
+			{
+				tty_write_address(c);
+
+				while(1);
+			}
+		}
 	}
-	// need to create queue
-//	uint32_t a;
-/*	for (int i = 0; i < 10; i++)
-	{
-		tty_write_string("head:");
-		queue_push(q, a);
-		tty_write_address((uint32_t)q->head);
-		tty_write_string(" ");
-		tty_write_string("tail:");
-		tty_write_address((uint32_t)q->tail);
-		tty_write_string("\n");
-	}
-	queue_node_t* res;
-	for (int i = 0; i < 10; i++)
-	{
-		res = queue_pop(q);
-		tty_write_string("head:");
-		tty_write_address((uint32_t)q->head);
-		tty_write_string(" ");
-		tty_write_string("tail:");
-		tty_write_address((uint32_t)q->tail);
-		tty_write_string(" ");
-		tty_write_string("res:");
-		tty_write_address((uint32_t)res);
-		tty_write_string("\n");
-	}
-*/
-//	tty_write_address(fork());
-//	switch_task();
-	while(1);
 }
 
 

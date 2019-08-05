@@ -105,9 +105,11 @@ void isr(registers_t regs)
 
 
 
+extern void switch_task();
+
 IRQ_HANDLER(timer){
 	(*((char*)(0xB8000 + 79*2)))++;
-//	switch_task();
+	switch_task();  
 }
 
 

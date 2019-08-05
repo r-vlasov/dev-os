@@ -23,7 +23,7 @@ section .text
         push    esp
 	push	eax			; Header magic 
         push	ebx			; push into the stack the address of the structure recieved from the loader
-	cli	
+
         call kmain  
 
 
