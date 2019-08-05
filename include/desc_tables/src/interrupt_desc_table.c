@@ -27,7 +27,8 @@ extern void __isr15();
 extern void __isr16();
 extern void __isr17();
 extern void __isr18();
-
+extern void __isr19();
+extern void __isr20();
 
 
 /* Interrupt Descriptor table */
@@ -47,10 +48,11 @@ void idt_handler(uint8_t index, void* handler, uint8_t type)
 
 void timer();
 
+
 void idt_init()
 {
 	memset(idt, 0, 256 * sizeof(Int_Node));
-	IDTR idtr = {256 * sizeof(Int_Node) - 1, idt};
+	IDTR idtr = {256 * sizeof(Int_Node), idt};
 	/* PIC (Programmable Interrupt Controller) settings */ 
 	outport(0x20, 0x11);
 	outport(0xA0, 0x11);
@@ -105,4 +107,8 @@ void isr(registers_t regs)
 
 IRQ_HANDLER(timer){
 	(*((char*)(0xB8000 + 79*2)))++;
+//	switch_task();
 }
+
+
+

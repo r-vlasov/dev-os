@@ -47,6 +47,7 @@ typedef struct {
 } page_table_t;
 
 
+
 /*
  * Intel proposes to use a two-tier system: The cpu reports the address of a 4kb page directory,
  * each entry in which contains the address of a 4 kb page table
@@ -58,11 +59,19 @@ typedef struct {
 	uint32_t physicalAddress; 	// physical address of tablesPhysical
 } page_directory_t;
 
-//
- 
+// 
 page_directory_t* kernel_directory;
 page_directory_t* current_directory;
 //
+
+
+/////////////////
+
+/* Switching directories */
+#define SWITCH_PAGE_DIRECTORY(dir)		asm volatile("	movl	%0, %%cr3\n" ::"r"(dir->physicalAddress));
+
+/////////////////
+
 
 /* Functions */
 

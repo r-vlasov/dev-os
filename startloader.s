@@ -1,15 +1,13 @@
     global start;		    ; The entry symbol for ELF
     extern kmain; 		    ; kmain is defined in C-file
-    global GET_EIP;
+    global __eip;
     global multiboot_spec 	    ; so we need to use it in C-code
-    global copy_page_physical
-
 
     MBOOT_HEADER_MAGIC 	equ 	0x1BADB002   					; define the magic number constant
     MBOOT_HEADER_FLAGS  equ 	0x0         					; multiboot flags
     MBOOT_CHECKSUM     	equ 	-( MBOOT_HEADER_MAGIC + MBOOT_HEADER_FLAGS) 	; calculate the checksum
                             ; (magic number + checksum + flags should equal 0)
-    KERNEL_STACK_SIZE equ 4096     						; size of stack in bytes
+    KERNEL_STACK_SIZE equ 0x2000    						; size of stack in bytes
     
 section ._mbHeader
     	align 4
@@ -22,13 +20,14 @@ section ._mbHeader
 section .text
     start:				; the loader label (defined as entry point in linker script)    
 	mov	esp, kernel_stack + KERNEL_STACK_SIZE    
-        push    esp 
-        push	ebx			; push into the stack the address of the structure recieved from the loade;r	
-	;push 	eax 			; push into the stack the identifier
+        push    esp
+	push	eax			; Header magic 
+        push	ebx			; push into the stack the address of the structure recieved from the loader
+	cli	
         call kmain  
 
 
-    GET_EIP:
+    __eip:
 	pop	eax
 	jmp	eax
 

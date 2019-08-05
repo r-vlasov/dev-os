@@ -16,4 +16,4 @@ typedef struct {
 
 void gdt_init();
 void gdt_set_gate(int32_t, uint32_t, uint32_t, uint8_t, uint8_t);
-
+void set_kernel_stack(uint32_t stack);

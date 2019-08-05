@@ -3,7 +3,7 @@
 
 global load_idt;
 global load_gdt;
-
+global load_tss;
 
 load_idt:
 	mov edx, [esp + 4]
@@ -24,3 +24,7 @@ load_gdt:
 	ret
 
 
+load_tss:
+	mov ax, 0x2B
+	ltr ax
+	ret

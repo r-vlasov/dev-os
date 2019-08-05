@@ -1,9 +1,12 @@
-
 CC = gcc
 CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
              -nostartfiles -nodefaultlibs -Wall -Wextra  -c
 AS = nasm
 ASFLAGS = -f elf32
+
+
+DIR1 = src
+
 
 %.o: %.c
 	$(CC) $(CFLAGS)  $< -o $@
@@ -11,16 +14,12 @@ ASFLAGS = -f elf32
 %.o: %.s
 	$(AS) $(ASFLAGS) $< -o $@
 
-DIR1 = desc_tables 
-DIR2 = memory_management
-DIR3 = heap
-DIR4 = multitasking
-run:	
+run:
 	$(MAKE) -C $(DIR1)
-	$(MAKE) -C $(DIR2)
-	$(MAKE) -C $(DIR3)
-	$(MAKE) -C $(DIR4)
 	mv *.o ..
+
+
+
 
 
 	

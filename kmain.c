@@ -49,24 +49,59 @@ typedef struct multiboot_header multiboot_header_t;
 extern page_directory_t* kernel_directory;
 extern page_directory_t* current_directory;
 
+
+#include "include/multitasking/headers/process_queue.h"
+
 uint32_t initial_esp;
-void kmain(multiboot_header_t *s, uint32_t initial_stack)
+
+void kmain(multiboot_header_t *mboot, uint32_t mboot_mag, uint32_t initial_stack)
 {
-    initial_esp = initial_stack;
+	initial_esp = initial_stack;
 	gdt_init();
 	idt_init();
 	drivers_init();
-//	tty_write_address(123);
 	paging_init();
 	task_init();
-	fork();
-	switch_task();
-//	tty_write_address(memcmp(current_directory, kernel_directory, sizeof(page_directory_t)));
-//	current_directory = kernel_directory;
-//	task_init();	tty_write_address(fork());
+	int a = fork();
+	if (a)
+	{
+		tty_write_address(a);
+		switch_task();
+	}
+	else
+	{
+		tty_write_address(a);
+		switch_task();
+	}
+	// need to create queue
+//	uint32_t a;
+/*	for (int i = 0; i < 10; i++)
+	{
+		tty_write_string("head:");
+		queue_push(q, a);
+		tty_write_address((uint32_t)q->head);
+		tty_write_string(" ");
+		tty_write_string("tail:");
+		tty_write_address((uint32_t)q->tail);
+		tty_write_string("\n");
+	}
+	queue_node_t* res;
+	for (int i = 0; i < 10; i++)
+	{
+		res = queue_pop(q);
+		tty_write_string("head:");
+		tty_write_address((uint32_t)q->head);
+		tty_write_string(" ");
+		tty_write_string("tail:");
+		tty_write_address((uint32_t)q->tail);
+		tty_write_string(" ");
+		tty_write_string("res:");
+		tty_write_address((uint32_t)res);
+		tty_write_string("\n");
+	}
+*/
+//	tty_write_address(fork());
 //	switch_task();
-
-//	tty_write_address(memcmp(current_directory, kernel_directory, sizeof(page_directory_t)));
 	while(1);
 }
 

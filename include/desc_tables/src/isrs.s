@@ -202,6 +202,12 @@ __isr18:
 
 
 
+
+
+
+
+
+
 ;				Common handler of 0-31 interrupts
 ; When processor receive an interrupt signal, it saves the state of the main registers(eip, esp, cs, eflags)
 ; Processor push them onto the stack.
@@ -235,4 +241,3 @@ __common_handler:
 	add esp, 8  ; Clear the stack of error code and interrupt number
 	iret
 	
-
