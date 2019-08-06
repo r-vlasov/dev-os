@@ -50,9 +50,11 @@ extern page_directory_t* kernel_directory;
 extern page_directory_t* current_directory;
 
 
-#include "include/multitasking/headers/process_queue.h"
+#include "include/multitasking/headers/process_list.h"
+
 
 uint32_t initial_esp;
+
 
 void kmain(multiboot_header_t *mboot, uint32_t mboot_mag, uint32_t initial_stack)
 {
@@ -63,35 +65,56 @@ void kmain(multiboot_header_t *mboot, uint32_t mboot_mag, uint32_t initial_stack
 	paging_init();
 	task_init();
 
+	tty_write_string("forking\n");
 	int a = fork();
-	if ( a != 0)
+	if (a)
 	{
-		tty_write_address(a);	
+		tty_write_string("parent: getpid() - ");tty_write_address(getpid()); tty_write_string("; getppid() - ");tty_write_address(getppid());tty_write_string("\n");
 	}
 	else
-	{ 	
-		int b = fork();
-		if (b != 0)
+	{
+		
+		tty_write_string("child: getpid() - ");tty_write_address(getpid()); tty_write_string("; getppid() - ");tty_write_address(getppid());tty_write_string("\n");
+	}	
+	/*	int a = fork();
+	if ( a != 0)
+	{
+		int d = fork();
+		if (d)
 		{
-			tty_write_address(b);
-
+			tty_write_address(d);
+			switch_task();
 		}
 		else
 		{
-			int c = fork();
-			if (c != 0)
+			tty_write_address(d);
+			switch_task();
+		}	
+	}
+	else
+	{
+		int h = fork();
+		if (h)
+		{
+			tty_write_address(h);
+			switch_task();
+		}
+		else
+		{
+			int k = fork();
+			if (k)
 			{
-				tty_write_address(c);
+				tty_write_address(k);
+				switch_task();
 			}
 			else
 			{
-				tty_write_address(c);
-
-				while(1);
+				tty_write_address(k);
 			}
 		}
+		
 	}
-	while(1);
+*/	while(1);
 }
 
 

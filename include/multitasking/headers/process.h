@@ -3,7 +3,7 @@
 
 #include "../../../lib/headers/stdlib.h"
 #include "../../memory_management/headers/paging.h"
-#include "task_tree.h"
+#include "process_tree.h"
 #include "process_queue.h"
 
 #define STATUS_INIT	0;
@@ -41,11 +41,16 @@ tree_t*		process_tree;
 queue_t*	process_queue;
 
 	void 		init_process_tree	();
+	void 		init_process_queue	();
 	process_t*	spawn_process_init	();
 	process_t*	spawn_process		(process_t* parent);
 	void 		set_process_environment	(process_t* process, page_directory_t* directory);
-	pid_t		getpid			(process_t*);
-	pid_t		getppid			(process_t*);
+	
+	void		process_queue_push	(process_t* proc);
+	process_t*	process_queue_pop	();
+
+	pid_t		getpid			();
+	pid_t		getppid			();
 	
 
 #endif

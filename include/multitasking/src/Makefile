@@ -1,4 +1,4 @@
-OBJECTS = process.o process_stack.o task_tree.o multitasking.o process_queue.o
+OBJECTS = process.o multitasking.o process_stack.o process_tree.o process_queue.o process_list.o
 CC = gcc
 CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
              -nostartfiles -nodefaultlibs -Wall -Wextra  -c

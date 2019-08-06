@@ -2,11 +2,12 @@
 #define TREE_H
 
 #include "../../../lib/headers/stdlib.h"
+#include "process_list.h"
 
 typedef struct tree_node {
 	void* 			value;
-	struct 	tree_node 	*child;
-	struct 	tree_node 	*parent;
+	struct	tree_node 	*parent;
+	list_t		 	*child;
 } tree_node_t;
 
 
