@@ -34,7 +34,7 @@ void idt_init();				// int description table initial
 
 
 #define IRQ_HANDLER(name) void name(); \
-	asm(#name ": pusha \n call _" #name " \n movb $0x20, %al \n outb %al, $0x20 \n outb %al, $0xA0 \n popa \n iret"); \
+	asm(#name ": pusha\n call _" #name " \n movb $0x20, %al \n outb %al, $0x20 \n outb %al, $0xA0  \n popa \n  iret"); \
 	void _ ## name()
 
 

@@ -67,7 +67,6 @@ void kmain(multiboot_header_t *mboot, uint32_t mboot_mag, uint32_t initial_stack
 	if ( a != 0)
 	{
 		tty_write_address(a);	
-		switch_task();
 	}
 	else
 	{ 	
@@ -75,7 +74,6 @@ void kmain(multiboot_header_t *mboot, uint32_t mboot_mag, uint32_t initial_stack
 		if (b != 0)
 		{
 			tty_write_address(b);
-			switch_task();
 
 		}
 		else
@@ -84,7 +82,6 @@ void kmain(multiboot_header_t *mboot, uint32_t mboot_mag, uint32_t initial_stack
 			if (c != 0)
 			{
 				tty_write_address(c);
-				switch_task();
 			}
 			else
 			{
@@ -94,6 +91,7 @@ void kmain(multiboot_header_t *mboot, uint32_t mboot_mag, uint32_t initial_stack
 			}
 		}
 	}
+	while(1);
 }
 
 

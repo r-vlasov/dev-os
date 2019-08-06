@@ -69,7 +69,6 @@ void switch_task()
 
 	if (process_queue->head == NULL)
 	{
-		tty_write_string("queue->head = NULL");
 		return;
 	}
 	uint32_t _eip, _ebp, _esp;	
@@ -106,7 +105,6 @@ void switch_task()
 		mov $0x12345, %%eax\n \
 		sti\n \
 		jmp %%ecx " :: "r"(_eip), "r"(_ebp), "r"(_esp), "r"(current_directory->physicalAddress));
-
 }
 
 
