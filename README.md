@@ -1,5 +1,5 @@
 # dev-os
-toy operation system. Special for learning
+  Toy operation system. Special for learning
 
 
 # Used software:
@@ -8,3 +8,12 @@ toy operation system. Special for learning
   - NASM assembler
   - GNU make
   - Bochs
+  - GRUB bootmanager
+ 
+ 
+ 
+ # Thanks to this tutorials:
+  - James Molloy's tutorial
+  - Write you own operation system[YOUTUBE]
+  - Let's write a kernel [101, 201]
+ 
