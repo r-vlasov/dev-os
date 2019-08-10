@@ -4,18 +4,11 @@
 extern void gdt_init();
 extern void idt_init();
 #include "include/heap/kmalloc.h"
-extern uint32_t kmalloc(uint32_t);
-#define MBOOT_MAGIC	0x2BADB002
-/*	
- *	The fact is that according to MULTIBOOT SPEC. GRUB places in %eax a special identifier
- *	that tells us the kernel was loaded by compatible bootloader 		
-*/
-
 
 
 typedef uint32_t u32int;
 
-struct multiboot
+typedef struct multiboot
 {
     u32int flags;
     u32int mem_lower;
@@ -41,80 +34,26 @@ struct multiboot
     u32int vbe_interface_seg;
     u32int vbe_interface_off;
     u32int vbe_interface_len;
-}  __attribute__((packed));
-
-typedef struct multiboot_header multiboot_header_t;
+} __attribute__((packed)) multiboot_header_t;
 
 
 extern page_directory_t* kernel_directory;
 extern page_directory_t* current_directory;
 
-
-#include "include/multitasking/headers/process_list.h"
-
-
 uint32_t initial_esp;
+extern char initrd[];
 
 
-void kmain(multiboot_header_t *mboot, uint32_t mboot_mag, uint32_t initial_stack)
+
+void kmain(uint32_t initial_stack, multiboot_header_t* mboot)
 {
 	initial_esp = initial_stack;
 	gdt_init();
 	idt_init();
 	drivers_init();
 	paging_init();
-	task_init();
-
-	tty_write_string("forking\n");
-	int a = fork();
-	if (a)
-	{
-		tty_write_string("parent: getpid() - ");tty_write_address(getpid()); tty_write_string("; getppid() - ");tty_write_address(getppid());tty_write_string("\n");
-	}
-	else
-	{
-		
-		tty_write_string("child: getpid() - ");tty_write_address(getpid()); tty_write_string("; getppid() - ");tty_write_address(getppid());tty_write_string("\n");
-	}	
-	/*	int a = fork();
-	if ( a != 0)
-	{
-		int d = fork();
-		if (d)
-		{
-			tty_write_address(d);
-			switch_task();
-		}
-		else
-		{
-			tty_write_address(d);
-			switch_task();
-		}	
-	}
-	else
-	{
-		int h = fork();
-		if (h)
-		{
-			tty_write_address(h);
-			switch_task();
-		}
-		else
-		{
-			int k = fork();
-			if (k)
-			{
-				tty_write_address(k);
-				switch_task();
-			}
-			else
-			{
-				tty_write_address(k);
-			}
-		}
-		
-	}
-*/	while(1);
+	
+	while(1);
 }
 
 

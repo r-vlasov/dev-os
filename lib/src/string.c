@@ -83,12 +83,20 @@ char* 	strcpy	(char* dest, const char* src)
 	return result;
 }
 
+
+/* 	String Comparement */
+int 	strcmp (const char* s1, const char* s2)
+{
+	int res = memcmp(s1, s2, strlen(s1));
+	return res;
+}
+
+
 /*	String Length	*/
 size_t 	strlen	(const char* s)
 {
 	size_t size = 0;
-	int i = 0;
-	while (s[i] != '\0')
+	while (s[size] != '\0')
 	{
 		size++;
 	}
@@ -108,3 +116,4 @@ void	reverse	(char* s)
 		s[i2] = ch;
 	}
 }
+
