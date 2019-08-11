@@ -248,22 +248,14 @@ __common_handler:
  ; Writing the messages
 global 	__syscall_128
 
-extern 	syscall_write_string_handler
+extern 	syscall_write_address_handler
 
 
 
 
 __syscall_128:
 	cli;
-	push byte 0
-	push byte 18
-	
-	jmp syscall_write_string;
-
-
-
-syscall_write_string:
-	pusha
+	pusha 		; pushing edi, esi, ebp, .... , eax
 	
 	mov ax, ds
 	push eax	; we can't "push ds"
@@ -276,15 +268,18 @@ syscall_write_string:
 	mov fs, ax
 	mov gs, ax
 
+	call syscall_write_address_handler
 
-	call syscall_write_string_handler
-	
 	pop eax
 	mov ds, ax
 	mov es, ax
 	mov fs, ax
 	mov gs, ax
 
+
 	popa
-	add esp, 8
-	iret	
+
+	iret
+
+
+

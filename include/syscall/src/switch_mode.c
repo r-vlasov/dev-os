@@ -16,6 +16,6 @@ void switch_to_user_mode()
 		pushl $0x1B;	\
 		push $1f;	\
 		iret;		\
-		1: \
+		1:		\
 		");
 }

@@ -185,7 +185,7 @@ page_t *get_page(uint32_t address, int make, page_directory_t *dir)
 	else
 		return NULL;
 }
-void page_fault(registers_t regs)
+void page_fault(registers_t* regs)
 {
 	// CR2 stores the linear address of the fault
 	uint32_t faulting_address;
@@ -197,7 +197,7 @@ void page_fault(registers_t regs)
 	 *  		->	interrupt error code		(see: IDT)
 	 *  		-> 	............
 	*/
-	uint32_t err_code = regs.err_code;
+	uint32_t err_code = regs->err_code;
 	uint32_t present = !((err_code & 0x1));	// Page not present
 	uint32_t rw = err_code & 0x2;		// Write operation ?
 	uint32_t us = err_code & 0x4;		// Processor was in user-mode?

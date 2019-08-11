@@ -61,6 +61,7 @@ void tty_clear_screen()
 		ptr[tty.width + i].symbol_ch = 0x00;
 
 	}	
+    return;
 }		
 
 void tty_write_string(const char* str)
@@ -69,6 +70,7 @@ void tty_write_string(const char* str)
 	{
 		tty_out_char(*str);
 	}
+    return;
 }
 
 void tty_write_address(const uint32_t address)
@@ -93,6 +95,7 @@ void tty_write_address(const uint32_t address)
 		tty_out_char(tmp-0xA+'A');
 	else
 		tty_out_char(tmp+'0');
+    return;
 }
 
 

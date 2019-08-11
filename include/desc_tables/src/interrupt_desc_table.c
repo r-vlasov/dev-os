@@ -106,6 +106,7 @@ void isr(registers_t regs)
 {
 	tty_out_char('0' + regs.number);
 	tty_write_address(regs.err_code);
+	while(1);
 	asm volatile("sti");
 }
 
@@ -118,7 +119,5 @@ IRQ_HANDLER(timer){
 	(*((char*)(0xB8000 + 79*2)))++;
 	switch_task();  
 }
-
-
 
 
