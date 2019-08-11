@@ -117,4 +117,3 @@ void switch_task()
 		jmp %%ecx " :: "r"(_eip), "r"(_ebp), "r"(_esp), "r"(current_directory->physicalAddress));
 }
 
-

@@ -31,6 +31,9 @@ extern void __isr19();
 extern void __isr20();
 
 
+extern void __syscall_128();
+
+
 /* Interrupt Descriptor table */
 Int_Node idt[IDT_SIZE];
 
@@ -41,12 +44,14 @@ void idt_handler(uint8_t index, void* handler, uint8_t type)
 	idt[index].selector = 0x08;
 	idt[index].lowerbits = address & 0xFFFF;
 	idt[index].higherbits = (address & 0xffff0000) >> 16;
-	idt[index].type = type;
+	idt[index].type = (type | 0x60);
 	idt[index].reserved = 0;
 	asm volatile("popf\n sti");
 }
 
 void timer();
+
+
 
 
 void idt_init()
@@ -88,6 +93,7 @@ void idt_init()
 	idt_handler(17, (uint32_t)__isr17,  0x8E);
 	idt_handler(18, (uint32_t)__isr18,  0x8E);	
 
+	idt_handler(128, (uint32_t)__syscall_128, 0x8E);
 	load_idt(&idtr); // Loading the address of IDTR	
 
 }
@@ -99,9 +105,9 @@ void idt_init()
 void isr(registers_t regs)
 {
 	tty_out_char('0' + regs.number);
+	tty_write_address(regs.err_code);
 	asm volatile("sti");
 }
-
 
 
 
@@ -112,6 +118,7 @@ IRQ_HANDLER(timer){
 	(*((char*)(0xB8000 + 79*2)))++;
 	switch_task();  
 }
+
 
 
 

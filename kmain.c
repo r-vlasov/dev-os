@@ -45,6 +45,10 @@ extern char initrd[];
 
 
 
+extern int syscall_tty_write_string(uint32_t);
+
+
+
 void kmain(uint32_t initial_stack, multiboot_header_t* mboot)
 {
 	initial_esp = initial_stack;
@@ -52,7 +56,10 @@ void kmain(uint32_t initial_stack, multiboot_header_t* mboot)
 	idt_init();
 	drivers_init();
 	paging_init();
-	
+
+	switch_to_user_mode();	
+
+	asm ("int $128");
 	while(1);
 }
 

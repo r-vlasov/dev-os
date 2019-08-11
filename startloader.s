@@ -4,15 +4,17 @@
     global multiboot_spec 	    ; so we need to use it in C-code
 
 
-MBOOT_PAGE_ALIGN	equ	1<<0
-MBOOT_MEM_INFO		equ	1<<1
+	MBOOT_PAGE_ALIGN	equ	1<<0
+	MBOOT_MEM_INFO		equ	1<<1
 
 
-    MBOOT_HEADER_MAGIC 	equ 	0x1BADB002   					; define the magic number constant
-    MBOOT_HEADER_FLAGS  equ 	(MBOOT_PAGE_ALIGN|MBOOT_MEM_INFO)		; multiboot flags
-    MBOOT_CHECKSUM     	equ 	-( MBOOT_HEADER_MAGIC + MBOOT_HEADER_FLAGS) 	; calculate the checksum
+    	MBOOT_HEADER_MAGIC 	equ 	0x1BADB002   					; define the magic number constant
+    	MBOOT_HEADER_FLAGS  	equ 	(MBOOT_PAGE_ALIGN|MBOOT_MEM_INFO)		; multiboot flags
+    	MBOOT_CHECKSUM     	equ 	-( MBOOT_HEADER_MAGIC + MBOOT_HEADER_FLAGS) 	; calculate the checksum
                             ; (magic number + checksum + flags should equal 0)
-    KERNEL_STACK_SIZE equ 0x2000    						; size of stack in bytes
+    	
+
+	KERNEL_STACK_SIZE equ 0x2000    						; size of stack in bytes
     
 section ._mbHeader
     	align 4

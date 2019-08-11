@@ -63,7 +63,8 @@ global __isr31
 
 
 
-extern isr
+
+extern isr ; - common handler
 
 
 
@@ -161,7 +162,7 @@ __isr12:
 ;13 		General Protection Fault Exception 	Yes
 __isr13:
 	cli
-	push byte 13
+	push byte 8
 	jmp __common_handler
 
 ;14 		Page Fault Exception 			Yes
@@ -203,11 +204,6 @@ __isr18:
 
 
 
-
-
-
-
-
 ;				Common handler of 0-31 interrupts
 ; When processor receive an interrupt signal, it saves the state of the main registers(eip, esp, cs, eflags)
 ; Processor push them onto the stack.
@@ -231,6 +227,58 @@ __common_handler:
 
 	call isr	; common handler describes in C-prog
 
+
+	pop eax
+	mov ds, ax
+	mov es, ax
+	mov fs, ax
+	mov gs, ax
+
+	
+	popa
+	add esp, 8  ; Clear the stack of error code and interrupt number
+	iret
+
+
+
+;		SYSCALLS		;   	
+
+
+
+ ; Writing the messages
+global 	__syscall_128
+
+extern 	syscall_write_string_handler
+
+
+
+
+__syscall_128:
+	cli;
+	push byte 0
+	push byte 18
+	
+	jmp syscall_write_string;
+
+
+
+syscall_write_string:
+	pusha
+	
+	mov ax, ds
+	push eax	; we can't "push ds"
+	
+
+	; Loading data segment offset designed for the kernel
+	mov ax, 0x10
+	mov ds, ax
+	mov es, ax
+	mov fs, ax
+	mov gs, ax
+
+
+	call syscall_write_string_handler
+	
 	pop eax
 	mov ds, ax
 	mov es, ax
@@ -238,6 +286,5 @@ __common_handler:
 	mov gs, ax
 
 	popa
-	add esp, 8  ; Clear the stack of error code and interrupt number
-	iret
-	
+	add esp, 8
+	iret	

@@ -1,4 +1,4 @@
-OBJECTS = interrupt_desc_table.o global_desc_table.o isrs.o 
+OBJECTS = interrupt_desc_table.o global_desc_table.o isrs.o
 CC = gcc
 CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
              -nostartfiles -nodefaultlibs -Wall -Wextra  -c

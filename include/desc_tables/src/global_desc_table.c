@@ -42,11 +42,11 @@ void write_tss(uint32_t num, uint32_t ss0, uint32_t esp0)
 	tss_entry.ss0 	= 	ss0;
 	tss_entry.esp0	=	esp0;
 	tss_entry.cs	=	0x0b;
-	tss_entry.ss	=
-		tss_entry.ds =
-		tss_entry.es =
-		tss_entry.fs =
-		tss_entry.gs = 	0x13;
+	tss_entry.ss	=	0x13;
+	tss_entry.ds 	= 	0x13;
+	tss_entry.es 	= 	0x13;
+	tss_entry.fs 	=	0x13;
+	tss_entry.gs 	= 	0x13;
 	tss_entry.iomap_base = sizeof(tss_entry);
 }
 
